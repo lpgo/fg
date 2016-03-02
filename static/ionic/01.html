@@ -1,0 +1,406 @@
+<!DOCTYPE htmL>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>08</title>
+  <link rel="stylesheet" href="ionic/css/ionic.min.css">
+  <style type="text/css">
+    #barion3{
+      margin-right: 35px;
+    }
+    #barion4{
+      text-decoration: underline;
+      color: pink;
+    }
+    #passenger{
+      margin-left:50%;
+    }
+
+    #driver{
+      margin-right: 50%;
+
+    }
+    #stades{
+      padding-left: 20%;
+      padding-right: 20%;
+
+    }
+
+    #start{
+      width: 10%;
+    }
+    #destination{
+      width: 10%;
+
+    }
+    #hotline{
+      color: blcak;
+      display: block;
+      margin-left: 20%;
+      font-size: 17px;
+    }
+
+
+    .line .col {
+      font-size: 16px;
+      margin:1px;
+      height:60px;
+      line-height: 60px;
+      text-align:center;
+      vertical-align: center;
+      line-height:32px;
+    }
+    .line .col div{
+      line-height: 46px;
+    }
+    .line-content .col{
+      height: 40px;
+     font-size: 14px;
+           line-height: 40px;
+
+
+    }
+    .line-content .col div{
+           line-height: 30px;
+
+    }
+   
+    
+
+
+  </style>
+</head>
+<body>
+  <div class="bar bar-header bar-positive button-left">
+   <button class="button icon ion-person"></button>
+   <button class="button icon ion-chatbox-working"></button>
+   <h1 class="title"></h1>
+   <button id="barion3" class="button pull-right">府谷</button>
+   <button id="barion4" class="button pull-right">切换</button>
+ </div>
+ <div class="bar bar-subheader bar-light button-left">
+  <button id="passenger" class="button button-large ">车主</button>
+
+  <h1 class="title"></h1>
+  <button id="driver" class="button button-large button-outline ">乘客</button>
+
+</div>
+
+
+<div class="scroll-content has-subheader">
+  <label id="stades"  class="item item-borderless item-input">
+    <span id="start" class="input-label">起点</span>
+    <input type="text" placeholder="府谷">
+    <span  id="destination" class="input-label">终点</span>
+    <input type="text" placeholder="... ...">
+  </label>
+
+  <div class="row">
+    <div class="col"><label id="hotline">热门路线</label></div>
+    <div class="col"><button class="button button-assertive" >府谷-榆林</button></div>
+    <div class="col"><button class="button button-assertive" >府谷-榆林</button></div>
+    <div class="col"><button class="button button-calm" >府谷-榆林</button></div>
+  </div>
+  <div class="row">
+   <div class="col"><button class="button button-clear" ></button></div>
+   <div class="col"><button class="button button-calm" >府谷-榆林</button></div>
+   <div class="col"><button class="button button-calm" >府谷-榆林</button></div>
+   <div class="col"><button class="button button-calm" >府谷-榆林</button></div>
+ </div>
+
+
+ <div class="row line">
+  <div class="col positive-bg light">
+    <div>星级</div>
+  </div>
+  <div class="col col  positive-bg light">
+    <div>线路</div>
+  </div>
+  <div class="col col  positive-bg light">
+    <div>出发时间</div>
+  </div>
+  <div class="col positive-bg light">
+    <div>车型</div>
+  </div>
+  <div class="col col  positive-bg light">
+    <div>余座</div>
+  </div>
+  <div class="col col  positive-bg light">
+    <div>单价</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+<div  class="row line line-content">
+  <div class="col stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xxx</div>
+  </div>
+  <div class="col stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+  <div class="col col  stable-bg dark">
+    <div>xx</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+  <!-- <div class="list">
+    <div class="item item-avatar">
+      <img src="http://www.hubwiz.com/course/5507ca5be564e51314f544e4/img/a-1.jpg">
+      <h2>Wangdong</h2>
+      <p>we go to clim moutain this weekneed</p>
+    </div>
+    <div class="item item-avatar">
+      <img src="http://www.hubwiz.com/course/5507ca5be564e51314f544e4/img/a-1.jpg">
+      <h2>renjiao</h2>
+      <p>Ok like this day,hope tomorrow is this </p>
+    </div>
+    <div class="item item-avatar">
+     <img src="http://www.hubwiz.com/course/5507ca5be564e51314f544e4/img/a-1.jpg">
+     <h2>wanghong</h2>
+     <p>yes yes yes ooogogo</p>
+   </div>
+   <div class="item item-avatar">
+    <img src="http://www.hubwiz.com/course/5507ca5be564e51314f544e4/img/a-1.jpg">
+    <h2>sandan</h2>
+    <p>money money i will make more money</p>
+  </div>
+</div> -->
+</div>
+</body>
+
+
+</html>

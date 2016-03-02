@@ -1,0 +1,165 @@
+//车主
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct Owner {
+    _id:Option<Bson>,
+    pub open_id: String,
+    pub name :Option<String>,
+    pub tel:String,
+    pub plate_number:String,
+    pub car_type : String
+}
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+//乘客
+pub struct Passenger {
+    _id:Option<Bson>,
+    pub open_id: String,
+    pub tel:String,
+    pub name:Option<String>
+}
+
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct Seat {
+    //_id: Option<Bson>,
+    passenger_id: Option<String>,
+    pay_id: String,
+    pay_status : bool
+}
+
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct Trip {
+    _id:Option<Bson>,
+    owner_id: String,
+    seat_count : u32,
+    current_seat : u32,
+    start_time : i64,
+    line:u32,
+    seats: Vec<Seat>,
+    status:String
+}
+
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub enum TripStatus {
+    Prepare,
+    Running,
+    Finish
+}
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct Line {
+     _id:Option<Bson>,
+     id:u32,
+     start:String,
+     end:String,
+     price:f32
+}
+
+//统一下单返回结果
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct PrePayResult {
+    return_code:String,
+    return_msg:Option<String>,
+    appid:String,
+    mch_id:String,
+    device_info:Option<String>,
+    nonce_str:String,
+    sign:String,
+    result_code:String,
+    err_code:Option<String>,
+    err_code_des:Option<String>,
+    trade_type:String,
+    prepay_id:String,
+    code_url:Option<String>
+}
+
+impl Owner {
+    pub fn new(tel:String,car_type:String,plate_number:String) -> Owner {
+       Owner{_id:None,name:None,
+                car_type:car_type,
+                tel:tel,
+                plate_number:plate_number,
+                open_id:"openid".to_string()}
+    }
+}
+
+impl Passenger {
+    pub fn new(tel:String) -> Passenger {
+        Passenger{_id:None,name:None,tel:tel,open_id:"open_id".to_string()}
+    }
+}
+
+impl Seat {
+    pub fn new() -> Seat {
+        Seat{passenger_id:None,pay_id:"pay id need weixin".to_string(),pay_status:false}
+    }
+}
+
+impl Trip {
+    pub fn new(oid:String, line_id:u32, start:chrono::DateTime<chrono::Local>, seat_count:u32) -> Trip {
+        let mut seats = Vec::new();
+        for _ in 0..seat_count {
+            seats.push(Seat::new());
+        }
+        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,seats: seats,status:"Prepare".to_string()}
+    }
+}
+
+pub fn de_xml<T>(data:&str) -> Result<T,Error> where T:Deserialize{
+  from_str(data)
+}
+
+pub fn en_bson<T>(data:T) -> Result<Document,()> where T:Serialize{
+    let mut e = Encoder::new();
+    if let Ok(_) = data.serialize(&mut e) {
+        match e.bson() {
+            Ok(b) => {
+                if let Bson::Document(d) = b {
+                    Ok(d)
+                } else {
+                    Err(())
+                }
+            }
+            Err(e) => {
+                warn!("error is {:?}", e);
+                Err(())
+            }
+        }
+    } else {
+        Err(())
+    }
+    
+}
+
+pub fn de_bson<T>(data:Document) -> Result<T,()> where T:Deserialize {
+    let mut d = Decoder::new(Bson::Document(data));
+    match Deserialize::deserialize(&mut d) {
+        Ok(t) => Ok(t),
+        Err(e) => {
+            warn!("error is {}",e);
+            Err(())
+        }
+    } 
+}
+
+#[derive(Serialize, Debug)]
+    pub struct Team {
+        name: String,
+        pts: u16
+    }
+
+    pub fn make_data () -> BTreeMap<String, Value> {
+        let mut data = BTreeMap::new();
+
+        data.insert("year".to_string(), value::to_value(&"2015"));
+
+        let teams = vec![ Team { name: "Jiangsu Sainty".to_string(),
+                                 pts: 43u16 },
+                          Team { name: "Beijing Guoan".to_string(),
+                                 pts: 27u16 },
+                          Team { name: "Guangzhou Evergrand".to_string(),
+                                 pts: 22u16 },
+                          Team { name: "Shandong Luneng".to_string(),
+                                 pts: 12u16 } ];
+
+        data.insert("teams".to_string(), value::to_value(&teams));
+        data.insert("engine".to_string(), value::to_value(&"serde_json"));
+        data
+    }

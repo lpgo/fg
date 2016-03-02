@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="ezApp">
+<head>
+	<meta charset="UTF-8">
+	<title>09</title>
+	<link rel="stylesheet" href="ionic/css/ionic.min.css">
+	<script src="ionic/js/ionic.bundle.min.js"></script>
+</head>
+<body ng-controller="ezCtrl">
+	<div class="scroll-content padding" 
+		on-swipe-up="onSwipeUp()" 
+		on-swipe-down="onSwipeDown()"
+		on-swipe-left="onSwipeLeft()" 
+		on-swipe-right="onSwipeRight()">
+		<p class="padding">按住鼠标快速划！</p>
+		<i class="icon {{icon}}"></i>
+	</div>
+</body>
+<script type="text/javascript">
+	
+	angular.module("ezApp",["ionic"])
+.controller("ezCtrl",function($scope){
+	$scope.icon="ion-arrow-expand";
+	$scope.onSwipeUp = function(){
+		$scope.icon="ion-arrow-up-a";
+	};
+	$scope.onSwipeDown = function(){
+		$scope.icon="ion-arrow-down-a";
+	};
+	$scope.onSwipeLeft = function(){
+		$scope.icon="ion-arrow-left-a";
+	};
+	$scope.onSwipeRight = function(){
+		$scope.icon="ion-arrow-right-a";
+	};
+});
+
+</script>
+</html>

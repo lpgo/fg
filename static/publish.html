@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+        <title>WeUI</title>
+        <link rel="stylesheet" href="style/weui.min.css"/>
+    </head>
+    <body>
+    <div class="weui_cells_title">publish trip</div>
+    	<form action="../publish_trip" method="post">
+			<div class="weui_cells weui_cells_form">
+			    <div class="weui_cell">
+			        <div class="weui_cell_hd">
+			            <label class="weui_label">line_id</label>
+			        </div>
+			        <div class="weui_cell_bd weui_cell_primary">
+			            <input class="weui_input" name="line_id" type="text" placeholder="input your line">
+			        </div>
+			    </div>
+			    <div class="weui_cell">
+			        <div class="weui_cell_hd">
+			            <label class="weui_label">start</label>
+			        </div>
+			        <div class="weui_cell_bd weui_cell_primary">
+			            <input class="weui_input" name="start" type="text" placeholder="input your start time">
+			        </div>
+			    </div>
+			    <div class="weui_cell">
+			        <div class="weui_cell_hd">
+			            <label class="weui_label">seat_count</label>
+			        </div>
+			        <div class="weui_cell_bd weui_cell_primary">
+			            <input class="weui_input" name="seat_count" type="text" placeholder="input your seat count">
+			        </div>
+			    </div>
+			   	<input type="submit" text="register" class="weui_btn weui_btn_primary">
+			</div>
+		</form>
+    </body>
+</html>

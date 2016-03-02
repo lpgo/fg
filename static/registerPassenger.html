@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+        <title>WeUI</title>
+        <link rel="stylesheet" href="style/weui.min.css"/>
+    </head>
+    <body>
+    <div class="weui_cells_title">Passenger register</div>
+    	<form action="../registerPassenger" method="post">
+			<div class="weui_cells weui_cells_form">
+			    <div class="weui_cell">
+			        <div class="weui_cell_hd">
+			            <label class="weui_label">name</label>
+			        </div>
+			        <div class="weui_cell_bd weui_cell_primary">
+			            <input class="weui_input" name="name" type="text" placeholder="input your name">
+			        </div>
+			    </div>
+			    <div class="weui_cell">
+			        <div class="weui_cell_hd">
+			            <label class="weui_label">tel</label>
+			        </div>
+			        <div class="weui_cell_bd weui_cell_primary">
+			            <input class="weui_input" type="tel" name="tel" placeholder="input your phone number">
+			        </div>
+			    </div>
+			    <input type="hidden" name="code" value="12341">
+			   	<input type="submit" text="register" class="weui_btn weui_btn_primary">
+			</div>
+		</form>
+    </body>
+</html>

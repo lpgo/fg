@@ -1,0 +1,43 @@
+[package]
+name = "weixin"
+version = "0.1.0"
+authors = ["lpgo <whereisgirl@126.com>"]
+build="build.rs"
+
+[build-dependencies]
+serde_codegen = "0.6.14"
+syntex = "*"
+
+[dependencies.bodyparser]
+git = "https://github.com/iron/body-parser.git"
+
+[dependencies]
+quickersort = "*"
+sha1="*"
+iron="*"
+urlencoded="*"
+mount="*"
+staticfile="*"
+mongodb="*"
+bson="*"
+router="*"
+persistent="*"
+plugin="*"
+serde="0.6.15"
+serde_xml="*"
+serde_json="0.6.1"
+hyper="*"
+openssl="*"
+rustc-serialize = "*"
+uuid="*"
+cookie="*"
+handlebars-iron="*"
+env_logger="*"
+log="*"
+chrono="*"
+
+[features]
+default=["serde_type"]
+serde_type = ["handlebars-iron/serde_type"]
+
+
