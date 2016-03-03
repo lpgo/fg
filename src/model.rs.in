@@ -21,8 +21,9 @@ pub struct Passenger {
 pub struct Seat {
     //_id: Option<Bson>,
     passenger_id: Option<String>,
-    pay_id: String,
-    pay_status : bool
+    pay_id: Option<String>,
+    pay_status : bool,
+    submit : bool
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -34,7 +35,8 @@ pub struct Trip {
     start_time : i64,
     line:u32,
     seats: Vec<Seat>,
-    status:String
+    status:String,
+    message:Option<String>
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -88,7 +90,7 @@ impl Passenger {
 
 impl Seat {
     pub fn new() -> Seat {
-        Seat{passenger_id:None,pay_id:"pay id need weixin".to_string(),pay_status:false}
+        Seat{passenger_id:None,pay_id:None,pay_status:false,submit:false}
     }
 }
 
@@ -98,7 +100,7 @@ impl Trip {
         for _ in 0..seat_count {
             seats.push(Seat::new());
         }
-        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,seats: seats,status:"Prepare".to_string()}
+        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,seats: seats,status:TripStatus::Prepare.to_string(),message:None}
     }
 }
 

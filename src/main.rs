@@ -54,8 +54,9 @@ fn main() {
     router.post("/registerOwner",wx::register_owner);
     router.post("/registerPassenger",wx::register_passenger);
     router.post("/login",wx::login);
-    router.post("/publish_trip",wx::publish_trip);
-    router.post("/get_trips", wx::get_trips);
+    router.post("/publishTrip",wx::publish_trip);
+    router.post("/getTrips", wx::get_trips);
+    router.post("/applyTrip",wx::apply_trip);
 
     router.get("/favicon.ico",wx::ico);
     

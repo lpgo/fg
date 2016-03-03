@@ -33,7 +33,6 @@ impl Service {
 	pub fn get_user_by_id(&self,open_id:&String) -> (Option<Owner>,Option<Passenger>) {
 		let o = self.0.get_by_openid::<Owner>(open_id).ok();
 		let p = self.0.get_by_openid::<Passenger>(open_id).ok();
-		info!("{:?}", p);
 		(o,p)
 	}
 
@@ -41,6 +40,10 @@ impl Service {
 		let data = self.0.get_trip_by_status("Prepare");
 		info!("{:?}",data);
 		serde_json::to_string(&data).unwrap()
+	}
+
+	pub fn apply_trip(&self,oid:&str,open_id:&str) -> String {
+
 	}
 
 	pub fn update_status(&self) {
