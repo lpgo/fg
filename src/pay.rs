@@ -37,27 +37,27 @@ pub struct PrePay {
 
 impl PrePay {
 
-	pub fn new() -> PrePay {
-		PrePay{appid : "String".to_string(),
-		    mch_id : "String".to_string(),
+	pub fn new(appid:String,mch_id:String,out_trade_no:String,msg:String,ip:String,openid:String) -> PrePay {
+		PrePay{appid : appid,
+		    mch_id : mch_id,
 		    device_info : None,
-		    nonce_str : "String".to_string(),
+		    nonce_str : out_trade_no,
 		    sign : "String".to_string(),
-		    body : "String".to_string(),
+		    body : msg,
 		    detail : None,
 		    attach : None,
-		    out_trade_no : "String".to_string(),
+		    out_trade_no : out_trade_no,
 		    fee_type : None,
 		    total_fee : 0,
-		    spbill_create_ip : "String".to_string(),
+		    spbill_create_ip : ip,
 		    time_start : None,
 		    time_expire : None,
 		    goods_tag : None,
-		    notify_url : "String".to_string(),
-		    trade_type : "String".to_string(),
+		    notify_url : "http://101.200.133.124/payResult",
+		    trade_type : "JSAPI".to_string(),
 		    product_id : None,
 		    limit_pay : None,
-		    openid : None
+		    openid : Some(openid)
 		}
 	}
 

@@ -241,6 +241,32 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
     }
 }
 
+pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
+
+    let mut can = false;
+    if let Some(user) = get_session(req, "user_type") {
+        if user == "passenger" || user == "both" {
+            can = true;
+        }
+    }
+    if !can {
+        return  Ok(Response::with((status::Ok,"{success:false,login:false}")));
+    }
+
+    let open_id = get_session(req, "open_id").unwrap();
+
+    let service = req.get::<PersistRead<Service>>().unwrap();
+    match req.get_ref::<UrlEncodedBody>() {
+        Ok(ref hashmap) => {
+            let oid = &hashmap.get("oid").unwrap()[0];
+            let ip = format!("{}",req.remote_addr.ip);
+            let payid = service.apply_trip(oid,&open_id,ip);            
+            Ok(Response::with((status::Ok,format!("{success:true,login:true,payid:\"{}\"}",payid))))
+        },
+        Err(_) => Ok(Response::with((status::Ok,"{success:false}")))
+    }
+}
+
 pub fn test(req: &mut Request) -> IronResult<Response> {
     let mut resp = Response::new();
 

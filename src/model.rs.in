@@ -22,7 +22,6 @@ pub struct Seat {
     //_id: Option<Bson>,
     passenger_id: Option<String>,
     pay_id: Option<String>,
-    pay_status : bool,
     submit : bool
 }
 
@@ -96,10 +95,7 @@ impl Seat {
 
 impl Trip {
     pub fn new(oid:String, line_id:u32, start:chrono::DateTime<chrono::Local>, seat_count:u32) -> Trip {
-        let mut seats = Vec::new();
-        for _ in 0..seat_count {
-            seats.push(Seat::new());
-        }
+        let seats = Vec::new();
         Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,seats: seats,status:TripStatus::Prepare.to_string(),message:None}
     }
 }

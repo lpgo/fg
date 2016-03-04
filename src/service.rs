@@ -4,6 +4,7 @@ use bson::Document;
 use iron::typemap::Key;
 use chrono::UTC;
 use serde_json;
+use pay::PrePay;
 
 pub struct Service(Dao);
 
@@ -42,8 +43,11 @@ impl Service {
 		serde_json::to_string(&data).unwrap()
 	}
 
-	pub fn apply_trip(&self,oid:&str,open_id:&str) -> String {
-
+	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> String {
+		let appid = "appid".to_string();
+		let mch_id = "mch_id".to_string();
+		let msg = "请支付你的拼车费".to_string();
+		let prepay = PrePay::new(appid, mch_id, oid.to_owned(), msg, ip, openid.to_owned()) 
 	}
 
 	pub fn update_status(&self) {
