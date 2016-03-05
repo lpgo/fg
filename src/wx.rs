@@ -18,6 +18,7 @@ use chrono::UTC;
 use chrono::offset::local::Local;
 use chrono::offset::TimeZone;
 use std::collections::HashMap;
+use jsonway;
 
 #[derive(Debug, Clone, RustcDecodable)]
 struct MyStructure {
@@ -254,14 +255,21 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
     }
 
     let open_id = get_session(req, "open_id").unwrap();
-
+    let ip = format!("{}",req.remote_addr);
     let service = req.get::<PersistRead<Service>>().unwrap();
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
-            let oid = &hashmap.get("oid").unwrap()[0];
-            let ip = format!("{}",req.remote_addr.ip);
-            let payid = service.apply_trip(oid,&open_id,ip);            
-            Ok(Response::with((status::Ok,format!("{success:true,login:true,payid:\"{}\"}",payid))))
+            let oid = &hashmap.get("oid").unwrap()[0];    
+            if let Ok(payid) = service.apply_trip(oid,&open_id,ip) {
+                let json_replay = jsonway::object(|j|{
+                    j.set("success",true);
+                    j.set("payid",payid.clone());
+                });
+                Ok(Response::with((status::Ok,format!("{}",payid))))
+            } else {
+                Ok(Response::with((status::Ok,"{success:false}")))
+            }  
+           
         },
         Err(_) => Ok(Response::with((status::Ok,"{success:false}")))
     }

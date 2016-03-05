@@ -11,6 +11,9 @@ syntex = "*"
 [dependencies.bodyparser]
 git = "https://github.com/iron/body-parser.git"
 
+[dependencies.jsonway]
+git = "https://github.com/rustless/jsonway"
+
 [dependencies]
 quickersort = "*"
 sha1="*"
@@ -31,7 +34,7 @@ openssl="*"
 rustc-serialize = "*"
 uuid="*"
 cookie="*"
-handlebars-iron="*"
+handlebars-iron="0.11.1"
 env_logger="*"
 log="*"
 chrono="*"

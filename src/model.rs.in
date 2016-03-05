@@ -33,7 +33,6 @@ pub struct Trip {
     current_seat : u32,
     start_time : i64,
     line:u32,
-    seats: Vec<Seat>,
     status:String,
     message:Option<String>
 }
@@ -67,7 +66,7 @@ pub struct PrePayResult {
     err_code:Option<String>,
     err_code_des:Option<String>,
     trade_type:String,
-    prepay_id:String,
+    pub prepay_id:String,
     code_url:Option<String>
 }
 
@@ -89,14 +88,13 @@ impl Passenger {
 
 impl Seat {
     pub fn new() -> Seat {
-        Seat{passenger_id:None,pay_id:None,pay_status:false,submit:false}
+        Seat{passenger_id:None,pay_id:None,submit:false}
     }
 }
 
 impl Trip {
     pub fn new(oid:String, line_id:u32, start:chrono::DateTime<chrono::Local>, seat_count:u32) -> Trip {
-        let seats = Vec::new();
-        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,seats: seats,status:TripStatus::Prepare.to_string(),message:None}
+        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,status:"Prepare".to_string(),message:None}
     }
 }
 

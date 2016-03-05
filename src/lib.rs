@@ -20,6 +20,7 @@ extern crate handlebars_iron as hbs;
 #[macro_use]
 extern crate log;
 extern crate chrono;
+extern crate jsonway;
 
 pub mod wx;
 pub mod db;
