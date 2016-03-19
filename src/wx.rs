@@ -2,35 +2,40 @@ use sha1;
 use quickersort;
 use iron::typemap::Key;
 use iron::prelude::*;
-use persistent::Read as PersistRead;
-use persistent::State as PersistState;
+use persist::Read as PersistRead;
+use persist::State as PersistState;
 use urlencoded::{UrlEncodedBody,UrlEncodedQuery};
 use iron::{status,Url};
 use iron::modifiers::Redirect;
 use db::Dao;
-use model::{self,Passenger,Owner,Trip};
+use model::{self,Passenger,Owner,Trip,ApiResult};
 use service::Service;
 use mongodb::db::ThreadedDatabase;
-use bodyparser;
 use session::{Session,SessionContext};
 use hbs::Template;
 use chrono::UTC;
 use chrono::offset::local::Local;
 use chrono::offset::TimeZone;
 use std::collections::HashMap;
+use std::io::Read;
 use jsonway;
+use pay;
+use serde_json;
+use hyper;
+use config::ConfigManager;
 
 #[derive(Debug, Clone, RustcDecodable)]
 struct MyStructure {
     a: String,
     b: Option<String>,
 }
-#[allow(dead_code)]
+#[derive(Clone,Debug)]
 pub struct WxInstance {
 	appid:       String,
 	secret:      String,
 	token:       String,
-	access_token: String,
+	pub access_token: String,
+             pub access_token_expires:u32,
 	open_id:      String,
 }
 
@@ -76,32 +81,86 @@ struct Message  {
 */
 impl WxInstance {
 	pub fn new() -> Self {
-	    WxInstance{appid:"wxeb1110111c602545".to_string(),secret:"2c686564f1130b9cb3ed08d828388573".to_string(),token:"lp3385".to_string(),access_token:"String".to_string(),open_id:"String".to_string()}
+                let appid = ConfigManager::get_config_str("app","appid");
+                let secret = ConfigManager::get_config_str("app","appsecret");
+                let token = ConfigManager::get_config_str("app","token");
+	   let mut instance =  WxInstance{appid:appid,secret:secret,token:token,access_token:String::new(),access_token_expires:0u32,open_id:String::new()};
+                instance.get_access_token();
+                instance
 	}
 
 	pub fn check(&self,timestamp:&str, nonce:&str, echostr:&str, signature:&str) -> Result<String,&str> {
-		let mut strs:Vec<&str> = vec![&self.token,nonce,timestamp];
-		println!("strs is {:?}", strs);
-		quickersort::sort(&mut strs[..]);
-		let ss = strs.join("");
-		let mut m = sha1::Sha1::new();
-		m.reset();
-        m.update(ss.as_bytes());
-        let hh = m.hexdigest();
-        println!("sha1 result is {}", hh);
-        if &hh == signature {
-        	Result::Ok(echostr.to_string())
-        } else {
-        	Result::Err("check error!")
-        }
+                	let mut strs:Vec<&str> = vec![&self.token,nonce,timestamp];
+                	println!("strs is {:?}", strs);
+                	quickersort::sort(&mut strs[..]);
+                	let ss = strs.join("");
+                	let mut m = sha1::Sha1::new();
+                	m.reset();
+                        m.update(ss.as_bytes());
+                        let hh = m.hexdigest();
+                        println!("sha1 result is {}", hh);
+                        if &hh == signature {
+                        	Result::Ok(echostr.to_string())
+                        } else {
+                        	Result::Err("check error!")
+                        }
 	}
+
+            pub fn get_access_token(& mut self){
+                let client = pay::ssl_client();
+                let url = format!("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}",self.appid,self.secret);
+                client.get(&url).send().and_then(|mut res|{
+                    let mut buf = String::new();
+                    res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
+                }).and_then(|buf|{
+                    serde_json::from_str::<ApiResult>(&buf).map_err(|err| hyper::Error::Method)
+                }).ok().and_then(|res|{  
+                       if let Some(token) = res.access_token {
+                            self.access_token = token;
+                            let expires = res.expires_in.unwrap_or(7200u32);
+                            self.access_token_expires = expires;
+                            Some(expires)
+                       } else {
+                             warn!("get access token error!!");
+                             None
+                       }
+                });
+            }
+
+           
+            pub fn get_user_list(&self){
+                let client = pay::ssl_client();
+                let url = format!("https://api.weixin.qq.com/cgi-bin/user/get?access_token={}",self.access_token);
+                warn!("url is {}",url);
+                client.get(&url).send().and_then(|mut res|{
+                    let mut buf = String::new();
+                    res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+                }).and_then(|buf|{
+                    warn!("userList is {}",buf);
+                    Ok(buf)
+                });
+            }
+
+            pub fn get_user_info(&self,openid:&str){
+                let client = pay::ssl_client();
+                let url = format!("https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}&lang=zh_CN",self.access_token,openid);
+                client.get(&url).send().and_then(|mut res|{
+                    let mut buf = String::new();
+                    res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+                }).and_then(|buf|{
+                    warn!("{} 's info is {}",openid,buf);
+                    Ok(buf)
+                });
+            }
+
 }
 
 impl Key for WxInstance { type Value = WxInstance; }
 
 
 pub fn wx(req:&mut Request) -> IronResult<Response>{
-    let instance = req.get::<PersistRead<WxInstance>>().unwrap();
+    let instance1 = req.get::<PersistState<WxInstance>>().unwrap();
+    let instance = instance1.read().unwrap();
     match req.get_ref::<UrlEncodedQuery>() {
         Ok(ref hashmap) => {
             let timestamp = &hashmap.get("timestamp").unwrap()[0];
@@ -288,7 +347,16 @@ pub fn test(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn ico(req: &mut Request) -> IronResult<Response> {
-    let urlstr = "http://127.0.0.1:6767/static/favicon.ico".to_owned();
+    let urlstr = "http://geekgogo.cn/static/favicon.ico".to_owned();
+    let mut response = Response::new();
+    let url = Url::parse(&urlstr).unwrap();
+    response.set_mut(status::Found).set_mut(Redirect(url));
+    Ok(response)
+}
+
+pub fn index(req: &mut Request) -> IronResult<Response> {
+    let domain = ConfigManager::get_config_str("app", "domain");
+    let urlstr = domain+"/static/index.html";
     let mut response = Response::new();
     let url = Url::parse(&urlstr).unwrap();
     response.set_mut(status::Found).set_mut(Redirect(url));
@@ -314,7 +382,7 @@ pub fn set_session(req: &mut Request,res:&mut Response,key:String,value:String) 
 
 pub fn get_session(req: &mut Request,key:&str) -> Option<String> {
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
-    let mut sc = sc1.read().unwrap();
+    let sc = sc1.read().unwrap();
     let session = sc.get_session(req);
     if let Some(s) = session {
         if let Some(value) = s.data.get(key) {
@@ -328,49 +396,3 @@ pub fn get_session(req: &mut Request,key:&str) -> Option<String> {
     }
 }
 
-/*
-pub fn test(req: &mut Request) -> IronResult<Response> {
-	let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
-    let mut sc = sc1.write().unwrap();
-	let session = sc.get_mut_session(req);
-    if let Some(s) = session {
-        let mut has = false;
-    	if let Some(name) = s.data.get("name") {
-    		println!("{}", name);
-            has = true;
-    	}
-        if !has {
-            s.data.insert("name".to_owned(),"liupeng".to_owned());
-        }
-    }
-    Ok(Response::with((status::Ok,"i don't who are you "))) 
-}
-*/
-/*
-fn log_body(req: &mut Request) -> IronResult<Response> {
-    let body = req.get::<bodyparser::Raw>();
-    match body {
-        Ok(Some(body)) => println!("Read body:\n{}", body),
-        Ok(None) => println!("No body"),
-        Err(err) => println!("Error: {:?}", err)
-    }
-
-    let json_body = req.get::<bodyparser::Json>();
-    match json_body {
-        Ok(Some(json_body)) => println!("Parsed body:\n{}", json_body),
-        Ok(None) => println!("No body"),
-        Err(err) => println!("Error: {:?}", err)
-    }
-
-    let struct_body = req.get::<bodyparser::Struct<MyStructure>>();
-    match struct_body {
-        Ok(Some(struct_body)) => println!("Parsed body:\n{:?}", struct_body),
-        Ok(None) => println!("No body"),
-        Err(err) => println!("Error: {:?}", err)
-    }
-
-
-
-    Ok(Response::with(status::Ok))
-}
-*/

@@ -5,7 +5,7 @@ use iron::prelude::*;
 use iron::{status,AfterMiddleware};
 use iron::modifiers::Header;
 use iron::typemap::Key;
-use persistent::State as PersistState;
+use persist::State as PersistState;
 
 use uuid::Uuid;
 

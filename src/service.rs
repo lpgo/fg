@@ -5,6 +5,7 @@ use iron::typemap::Key;
 use chrono::UTC;
 use serde_json;
 use pay::{self,PrePay};
+use config::ConfigManager;
 
 pub struct Service(Dao);
 
@@ -45,9 +46,9 @@ impl Service {
 
 	//todo
 	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String,()> {
-		let appid = "appid".to_string();
-		let mch_id = "mch_id".to_string();
-		let msg = "请支付你的拼车费".to_string();
+		let appid = ConfigManager::get_config_str("app", "appid");
+		let mch_id = ConfigManager::get_config_str("app", "mchid");
+		let msg = "pinchefei".to_string();
 		let prepay = PrePay::new(appid, mch_id, oid.to_owned(), msg, ip, openid.to_owned());
 		if let Ok(result) = pay::pre_pay(prepay) {
 			Ok(result.prepay_id.clone())

@@ -8,6 +8,7 @@ use model;
 use serde::{Deserialize, Serialize, Deserializer};
 use rustc_serialize::json;
 use chrono::offset::local::Local;
+use config::ConfigManager;
 
 
 pub trait ToDoc {
@@ -123,7 +124,10 @@ impl Clone for Dao {
 fn get_db() -> Arc<DatabaseInner> {
 	let client = Client::connect("localhost", 27017)
         .ok().expect("Failed to initialize standalone client.");
-    let db = client.db("mydb");
-    db.auth("lp3385","8738225").unwrap();
+    let db_name = ConfigManager::get_config_str("app", "dbname");
+    let db_user = ConfigManager::get_config_str("app", "dbuser");
+    let db_pwd = ConfigManager::get_config_str("app", "dbpwd");
+    let db = client.db(&db_name);
+    db.auth(&db_user,&db_pwd).unwrap();
     db
 }

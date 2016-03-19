@@ -1,3 +1,4 @@
+use hyper;
 use hyper::client::{Client,Pool};
 use hyper::net::HttpsConnector;
 use hyper::net::Openssl;
@@ -5,6 +6,11 @@ use model::{PrePayResult,de_xml};
 use std::io::Read;
 use std::default::Default;
 use std::sync::Arc;
+use std::path::Path;
+use std::collections::BTreeMap;
+use uuid::Uuid;
+use md5;
+use config::ConfigManager;
 
 use openssl::ssl::{Ssl, SslContext, SslStream, SslMethod, SSL_VERIFY_NONE};
 use openssl::ssl::error::StreamError as SslIoError;
@@ -36,13 +42,14 @@ pub struct PrePay {
 }
 
 impl PrePay {
-
+	
 	pub fn new(appid:String,mch_id:String,out_trade_no:String,msg:String,ip:String,openid:String) -> PrePay {
+		let domain = ConfigManager::get_config_str("app", "domain");
 		PrePay{appid : appid,
 		    mch_id : mch_id,
 		    device_info : None,
 		    nonce_str : out_trade_no.clone(),
-		    sign : "String".to_string(),
+		    sign : String::new(),
 		    body : msg,
 		    detail : None,
 		    attach : None,
@@ -53,7 +60,7 @@ impl PrePay {
 		    time_start : None,
 		    time_expire : None,
 		    goods_tag : None,
-		    notify_url : "http://101.200.133.124/payResult".to_string(),
+		    notify_url : domain+"/payResult",
 		    trade_type : "JSAPI".to_string(),
 		    product_id : None,
 		    limit_pay : None,
@@ -86,10 +93,16 @@ impl PrePay {
 pub fn ssl_client() -> Client {
 
 	let mut ctx = SslContext::new(SslMethod::Sslv23).unwrap();
-    ctx.set_cipher_list("DEFAULT").unwrap();
-    //try!(ctx.set_certificate_file(cert.as_ref(), X509FileType::PEM));
-    //try!(ctx.set_private_key_file(key.as_ref(), X509FileType::PEM));
-    ctx.set_verify(SSL_VERIFY_NONE, None);
+	ctx.set_cipher_list("DEFAULT").unwrap();
+
+	let cert = Path::new("cert/cert.pem");
+	let key = Path::new("cert/key.pem");
+	let ca = Path::new("cert/ca.pem");
+
+	ctx.set_certificate_file(&cert, X509FileType::PEM);
+	ctx.set_private_key_file(&key, X509FileType::PEM);
+	ctx.set_CA_file(&ca);
+	ctx.set_verify(SSL_VERIFY_NONE, None);
 	let https = HttpsConnector::new(Openssl { context: Arc::new(ctx) });
 	let pool = Pool::with_connector(Default::default(),https);
 	return Client::with_connector(pool);
@@ -108,6 +121,71 @@ pub fn pre_pay(p : PrePay) -> Result<PrePayResult,&'static str> {
 		}
 	}
 	Err("prepay error!!!")  
+}
+
+pub fn pay_to_client(openid:&str,amount:&str) {
+
+	let nonce_str = Uuid::new_v4().to_simple_string();
+	let api_key = ConfigManager::get_config_str("app", "apikey");
+	let appid = ConfigManager::get_config_str("app", "appid");
+	let mchid = ConfigManager::get_config_str("app", "mchid");
+	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
+	strs.insert("mch_appid",&appid);
+	strs.insert("mchid",&mchid);
+	strs.insert("nonce_str",&nonce_str);
+	strs.insert("partner_trade_no",&nonce_str);
+	strs.insert("openid",openid);
+	strs.insert("check_name","NO_CHECK");
+	strs.insert("amount",amount);
+	strs.insert("desc","thank you");
+	strs.insert("spbill_create_ip","192.168.1.1");
+	let mut ss = String::new();
+	for (k,v) in strs {
+		ss.push_str(k);
+		ss.push('=');
+		ss.push_str(v);
+		ss.push('&');
+	}
+	ss.push_str("key=");
+	ss.push_str(&api_key);
+	let sign = to_md5(&ss);
+
+	let xml = format!(r#"
+		<xml>
+			<mch_appid>{}</mch_appid>
+			<mchid>{}</mchid>
+			<nonce_str>{}</nonce_str>
+			<partner_trade_no>{}</partner_trade_no>
+			<openid>{}</openid>
+			<check_name>NO_CHECK</check_name>
+			<amount>{}</amount>
+			<desc>thank you</desc>
+			<spbill_create_ip>192.168.1.1</spbill_create_ip>
+			<sign>{}</sign>
+		</xml>
+	"#,&appid,&mchid,&nonce_str,&nonce_str,openid,amount,sign);
+
+	warn!("xml is {}",xml);
+
+	let client = ssl_client();
+             let url = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
+            client.post(url).body(&xml).send().and_then(|mut res|{
+                let mut buf = String::new();
+                res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+            }).and_then(|buf|{
+                warn!("pay clinet result is {}",buf);
+                Ok(buf)
+            });
+}
+
+pub fn to_md5(s:&str) -> String {
+	let mut context = md5::Context::new();
+            context.consume(s.as_bytes());
+            let mut digest = String::with_capacity(2 * 16);
+            for x in &context.compute()[..] {
+                digest.push_str(&format!("{:02x}", x));
+            }
+            digest.to_uppercase()
 }
 
 
