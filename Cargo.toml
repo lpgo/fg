@@ -6,7 +6,7 @@ build="build.rs"
 
 [build-dependencies]
 serde_codegen = "0.6.14"
-syntex = "*"
+syntex = "0.29.0"
 
 [dependencies.jsonway]
 git = "https://github.com/rustless/jsonway"
@@ -25,7 +25,7 @@ plugin="*"
 serde="0.6.15"
 serde_xml="*"
 serde_json="0.6.1"
-hyper="*"
+hyper="0.7.2"
 openssl="*"
 rustc-serialize = "*"
 uuid="*"
