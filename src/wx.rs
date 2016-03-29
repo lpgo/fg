@@ -8,7 +8,7 @@ use urlencoded::{UrlEncodedBody,UrlEncodedQuery};
 use iron::{status,Url};
 use iron::modifiers::Redirect;
 use db::Dao;
-use model::{self,Passenger,Owner,Trip,ApiResult};
+use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType};
 use service::Service;
 use mongodb::db::ThreadedDatabase;
 use session::{Session,SessionContext};
@@ -18,6 +18,7 @@ use chrono::offset::local::Local;
 use chrono::offset::TimeZone;
 use std::collections::HashMap;
 use std::io::Read;
+use std::marker::{Sync,Send};
 use jsonway;
 use pay;
 use serde_json;
@@ -198,18 +199,17 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
 pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
 
     let mut can = false;
-
-    if let Some(user) = get_session(req, "user_type") {
-        if user == "owner" || user == "both" {
+    let mut  login_status:LoginStatus = LoginStatus::default();
+    if let Some(user) = get_session::<LoginStatus>(req) {
+        if user.user_type == UserType::Owner {
             can = true;
         }
+        login_status = user.clone();
     }
 
     if !can {
         return  Ok(Response::with((status::Ok,"you are not a owner ,can't publish Trip !")));
     }
-
-    let open_id = get_session(req, "open_id").unwrap();
 
     let service = req.get::<PersistRead<Service>>().unwrap();
     match req.get_ref::<UrlEncodedBody>() {
@@ -222,7 +222,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                 if let Ok(seat) = seat_count.parse::<u32>() {
                     if let Ok(start) = Local.datetime_from_str(start_time, "%Y-%m-%d %H:%M:%S") {
                         //start.with_timezone(&UTC);
-                        let t = Trip::new(open_id,id,start,seat);
+                        let t = Trip::new(login_status.open_id.clone(),id,start,seat);
                         service.add_trip(t);
                         return Ok(Response::with((status::Ok,"publish Trip sucess!")));
                     }
@@ -272,25 +272,22 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
             (Some(o),None) => {
                 let s = r#"{"success":true,"type":"owner"}"#;
                 let mut res = Response::with((status::Ok,s));
-                set_session(req, &mut res, "open_id".to_string(), o.open_id);
-                set_session(req, &mut res, "name".to_string(), o.name.unwrap_or("anonymous".to_string()));
-                set_session(req, &mut res, "user_type".to_string(), "owner".to_string());
+                let login_status = LoginStatus{open_id:o.open_id,user_type:UserType::Owner,name:o.name};
+                set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
             (None,Some(p)) => {
                 let s = r#"{"success":true,"type":"passenger"}"#;
                 let mut res = Response::with((status::Ok,s));
-                set_session(req, &mut res, "open_id".to_string(), p.open_id);
-                set_session(req, &mut res, "name".to_string(), p.name.unwrap_or("anonymous".to_string()));
-                set_session(req, &mut res, "user_type".to_string(), "passenger".to_string());
+                let login_status = LoginStatus{open_id:p.open_id,user_type:UserType::Passenger,name:p.name};
+                set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
             (Some(o),Some(p)) => {
-                let s = r#"{"success":true,"type":"both"}"#;
+                let s = r#"{"success":true,"type":"owner"}"#;
                 let mut res = Response::with((status::Ok,s));
-                set_session(req, &mut res, "open_id".to_string(), p.open_id);
-                set_session(req, &mut res, "name".to_string(), p.name.unwrap_or("anonymous".to_string()));
-                set_session(req, &mut res, "user_type".to_string(), "both".to_string());
+                let login_status = LoginStatus{open_id:o.open_id,user_type:UserType::Owner,name:o.name};
+                set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
             (None,None) => {
@@ -304,22 +301,20 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
 pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
     let mut can = false;
-    if let Some(user) = get_session(req, "user_type") {
-        if user == "passenger" || user == "both" {
+    let mut  login_status:LoginStatus = LoginStatus::default();
+    if let Some(status) = get_session::<LoginStatus>(req) {
             can = true;
-        }
+            login_status = status.clone();
     }
     if !can {
         return  Ok(Response::with((status::Ok,"{success:false,login:false}")));
     }
-
-    let open_id = get_session(req, "open_id").unwrap();
     let ip = format!("{}",req.remote_addr);
     let service = req.get::<PersistRead<Service>>().unwrap();
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
             let oid = &hashmap.get("oid").unwrap()[0];    
-            if let Ok(payid) = service.apply_trip(oid,&open_id,ip) {
+            if let Ok(payid) = service.apply_trip(oid,&login_status.open_id,ip) {
                 let json_replay = jsonway::object(|j|{
                     j.set("success",true);
                     j.set("payid",payid.clone());
@@ -335,63 +330,47 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 }
 
 pub fn test(req: &mut Request) -> IronResult<Response> {
-    let mut resp = Response::new();
-
-    // open http://localhost:3000/
-    
     let data = model::make_data();
-    info!("{:?}", data);
-    resp.set_mut(Template::new("index", data)).set_mut(status::Ok);
-    
-    Ok(resp)
+    res_template!("index",data)
 }
 
 pub fn ico(req: &mut Request) -> IronResult<Response> {
-    let urlstr = "http://geekgogo.cn/static/favicon.ico".to_owned();
-    let mut response = Response::new();
-    let url = Url::parse(&urlstr).unwrap();
-    response.set_mut(status::Found).set_mut(Redirect(url));
-    Ok(response)
+    let domain = ConfigManager::get_config_str("app", "domain");
+    let urlstr = domain+"/static/favicon.ico";
+    redirect!(&urlstr)
 }
 
 pub fn index(req: &mut Request) -> IronResult<Response> {
     let domain = ConfigManager::get_config_str("app", "domain");
     let urlstr = domain+"/static/index.html";
-    let mut response = Response::new();
-    let url = Url::parse(&urlstr).unwrap();
-    response.set_mut(status::Found).set_mut(Redirect(url));
-    Ok(response)
+    redirect!(&urlstr)
 }
 
-pub fn set_session(req: &mut Request,res:&mut Response,key:String,value:String) {
+pub fn set_session<K:Key>(req: &mut Request,res:&mut Response,value:K::Value) where K::Value:Clone{
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
     let mut sc = sc1.write().unwrap();
     let mut has = false;
     {
         let mut session = sc.get_mut_session(req);
         if let Some(s) = session {
-            s.data.insert(key.clone(),value.clone());
+            s.data.insert::<K>(value.clone());
             has = true;
         }  
     }
     if !has {
         let s = sc.new_session(res);
-        s.data.insert(key,value);
+        s.data.insert::<K>(value);
     }           
 }
 
-pub fn get_session(req: &mut Request,key:&str) -> Option<String> {
+pub fn get_session<K:Key>(req: & mut Request) -> Option<K::Value> where K::Value:Clone {
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
     let sc = sc1.read().unwrap();
     let session = sc.get_session(req);
     if let Some(s) = session {
-        if let Some(value) = s.data.get(key) {
-            Some(value.to_owned())
-        } else {
-            None
-        }
+        s.data.get::<K>().map(|v| v.clone())
     } else {
-        warn!("get session key {} error", key);
+        warn!("get session key  error");
         None
     }
 }

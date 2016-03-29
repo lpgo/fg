@@ -25,6 +25,24 @@ extern crate md5;
 extern crate toml;
 #[macro_use] extern crate lazy_static;
 
+macro_rules! res_template {
+
+    ($name:expr, $data:expr) => ({
+         	let mut resp = Response::new();
+	resp.set_mut(Template::new($name, $data)).set_mut(status::Ok);
+	Ok(resp)
+    })  
+}
+
+macro_rules! redirect {
+    ($url:expr) => ({
+	let mut response = Response::new();
+	let url = Url::parse($url).unwrap();
+	response.set_mut(status::Found).set_mut(Redirect(url));
+	Ok(response)
+    })  
+}
+
 pub mod wx;
 pub mod db;
 pub mod model;
@@ -33,3 +51,5 @@ pub mod service;
 pub mod session;
 pub mod config;
 pub mod persist;
+
+

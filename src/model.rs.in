@@ -78,6 +78,30 @@ pub struct ApiResult {
     pub errmsg:Option<String>
 }
 
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
+pub enum UserType {
+    Owner,
+    Passenger
+}
+
+impl Default for UserType {
+    // add code here
+    fn default() -> UserType {
+        UserType::Passenger
+    }
+}
+
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone,Default)]
+pub struct LoginStatus {
+    pub user_type : UserType,
+    pub open_id : String,
+    pub name : Option<String>
+}
+
+impl Key for LoginStatus {
+    type Value = LoginStatus;
+}
+
 impl Owner {
     pub fn new(tel:String,car_type:String,plate_number:String) -> Owner {
        Owner{_id:None,name:None,

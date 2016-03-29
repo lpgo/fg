@@ -1,17 +1,18 @@
 use hyper::header::{Headers, Cookie,SetCookie};
 use cookie::Cookie as CookieObj;
 use std::collections::HashMap;
+use std::marker::{Sync,Send};
 use iron::prelude::*;
 use iron::{status,AfterMiddleware};
 use iron::modifiers::Header;
-use iron::typemap::Key;
+use iron::typemap::{TypeMap, Key};
 use persist::State as PersistState;
 
 use uuid::Uuid;
 
-#[derive(Debug)]
+
 pub struct Session{
-	pub data: HashMap<String,String>,
+    pub data: TypeMap,
     expire: u32
 }
 
@@ -23,8 +24,16 @@ impl Key for SessionContext {
     type Value = SessionContext;
 }
 
+unsafe impl Sync for SessionContext {
+    // add code here
+}
+
+unsafe impl Send for SessionContext {
+    // add code here
+}
+
 impl SessionContext {
-    pub fn get_session(&self,req:&mut Request) -> Option<&Session> {
+    pub fn get_session(&self,req:& Request) -> Option<&Session> {
       	let cookie = req.headers.get::<Cookie>();
     	match cookie {
             Some(ref value) => {
@@ -68,7 +77,7 @@ impl SessionContext {
     	cookie.path = Some("/".to_owned());
         res.set_mut(Header(SetCookie(vec![cookie])));
     	
-    	let session = Session { data:HashMap::new(),expire:0u32 };
+    	let session = Session { data:TypeMap::new(),expire:0u32 };
     	self.0.insert(uid.clone(),session);
         self.0.get_mut(&uid).unwrap()
     }
