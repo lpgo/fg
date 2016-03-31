@@ -353,7 +353,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
 
     let mut code = String::new();
 
-    match req.get_ref::<UrlEncodedBody>() {
+    match req.get_ref::<UrlEncodedQuery>() {
         Ok(ref hashmap) => {
             code = hashmap.get("code").unwrap()[0].clone();
         },
