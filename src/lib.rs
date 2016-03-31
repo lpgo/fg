@@ -26,12 +26,10 @@ extern crate toml;
 #[macro_use] extern crate lazy_static;
 
 macro_rules! res_template {
-
-    ($name:expr, $data:expr) => ({
-         	let mut resp = Response::new();
-	resp.set_mut(Template::new($name, $data)).set_mut(status::Ok);
-	Ok(resp)
-    })  
+    ($name:expr, $data:expr,$resp:expr) => ({
+	$resp.set_mut(Template::new($name, $data)).set_mut(status::Ok);
+	Ok($resp)
+    }) 
 }
 
 macro_rules! redirect {

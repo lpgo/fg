@@ -258,6 +258,7 @@ pub fn get_trips(req:&mut Request) -> IronResult<Response> {
     Ok(Response::with((status::Ok,service.get_new_trips())))
 }
 
+/*
 pub fn login(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut open_id = String::new();
@@ -297,7 +298,7 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
         }
     }
 }
-
+*/
 pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
     let mut can = false;
@@ -331,7 +332,8 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
 pub fn test(req: &mut Request) -> IronResult<Response> {
     let data = model::make_data();
-    res_template!("index",data)
+    let mut resp = Response::new();
+    res_template!("index",data,resp)
 }
 
 pub fn ico(req: &mut Request) -> IronResult<Response> {
@@ -345,6 +347,50 @@ pub fn index(req: &mut Request) -> IronResult<Response> {
     let urlstr = domain+"/static/index.html";
     redirect!(&urlstr)
 }
+
+pub fn index_template(req: &mut Request) -> IronResult<Response> {
+    let data = model::make_data();
+
+    let mut code = String::new();
+
+    match req.get_ref::<UrlEncodedBody>() {
+        Ok(ref hashmap) => {
+            code = hashmap.get("code").unwrap()[0].clone();
+        },
+        Err(_) => return Ok(Response::with((status::Ok,"error parameters!")))
+    };
+    let appid = ConfigManager::get_config_str("app", "appid");
+    let secret = ConfigManager::get_config_str("app", "appsecret");
+
+    let mut resp = Response::new();
+
+    let client = pay::ssl_client();
+    let url = format!("https://api.weixin.qq.com/sns/oauth2/access_token?appid={}&secret={}&code={}&grant_type=authorization_code",appid,secret,code);
+    warn!("url is {}",url);
+    client.get(&url).send().and_then(|mut res|{
+        let mut buf = String::new();
+        res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
+    }).and_then(|buf|{
+        serde_json::from_str::<ApiResult>(&buf).map_err(|err| hyper::Error::Method)
+    }).ok().and_then(|res|{  
+           if let Some(token) = res.access_token {
+                let mut login_status = LoginStatus::default();
+                login_status.web_token = Some(token);
+                login_status.refresh_token = res.refresh_token;
+                login_status.open_id = res.openid.unwrap_or(String::new());
+                warn!("{:?}",login_status);
+                set_session::<LoginStatus>(req, &mut resp, login_status);
+                Some(())
+           } else {
+                 warn!("get access token error!!");
+                 None
+           }
+    });
+
+    res_template!("index",data,resp)
+}
+
+
 
 pub fn set_session<K:Key>(req: &mut Request,res:&mut Response,value:K::Value) where K::Value:Clone{
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();

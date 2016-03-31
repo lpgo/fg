@@ -49,10 +49,13 @@ fn main() {
 
     router.post("/registerOwner",wx::register_owner);
     router.post("/registerPassenger",wx::register_passenger);
-    router.post("/login",wx::login);
+    //router.post("/login",wx::login);
     router.post("/publishTrip",wx::publish_trip);
     router.post("/getTrips", wx::get_trips);
     router.post("/applyTrip",wx::apply_trip);
+
+    //template
+    router.get("/pinche/index.html",wx::index_template);
 
     router.get("/favicon.ico",wx::ico);
     router.get("/",wx::index);

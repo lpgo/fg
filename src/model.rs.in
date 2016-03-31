@@ -75,19 +75,23 @@ pub struct ApiResult {
     pub access_token: Option<String>,
     pub expires_in:Option<u32>,
     pub errcode:Option<i32>,
-    pub errmsg:Option<String>
+    pub errmsg:Option<String>,
+    pub refresh_token:Option<String>,
+    pub openid:Option<String>,
+    pub scope:Option<String>
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub enum UserType {
     Owner,
-    Passenger
+    Passenger,
+    Anonymous
 }
 
 impl Default for UserType {
     // add code here
     fn default() -> UserType {
-        UserType::Passenger
+        UserType::Anonymous
     }
 }
 
@@ -95,7 +99,9 @@ impl Default for UserType {
 pub struct LoginStatus {
     pub user_type : UserType,
     pub open_id : String,
-    pub name : Option<String>
+    pub name : Option<String>,
+    pub web_token : Option<String>,
+    pub refresh_token : Option<String>
 }
 
 impl Key for LoginStatus {
