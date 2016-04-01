@@ -35,6 +35,7 @@ unsafe impl Send for SessionContext {
 impl SessionContext {
     pub fn get_session(&self,req:& Request) -> Option<&Session> {
       	let cookie = req.headers.get::<Cookie>();
+            warn!("cookie is {:?}",cookie);
     	match cookie {
             Some(ref value) => {
 	    		let Cookie(ref ckvec) = **value;
