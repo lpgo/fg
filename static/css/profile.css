@@ -1,0 +1,92 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+body {
+  width: 100%;
+  background-color: #edebeb;
+}
+#title {
+  text-align: center;
+  height: 2em;
+  line-height: 2em;
+  font-size: 1.1em;
+  background-color: white;
+  color: #c0bbbb;
+}
+#profile {
+  font-size: 1.2em;
+  padding-left: 1em;
+  padding-right: 1.23em;
+  height: 4em;
+  margin-top: 1.4em;
+  background-color: white;
+  text-align: center;
+  line-height: 4em;
+  position: relative;
+}
+#profile img {
+  background-color: #d8d8d8;
+  position: absolute;
+  top: 0.5em;
+  left: 2em;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+}
+#profile i {
+  font-size: 1.1em;
+  color: #c0bbbb;
+}
+#aboutme {
+  text-align: left;
+  margin-top: 2em;
+}
+.aboutmeitem {
+  font-size: 1.1em;
+  padding: 0 1.5em;
+  line-height: 2.8em;
+  background-color: white;
+  border-bottom: 1px solid #cacaca;
+  height: 2.8em;
+}
+.aboutmeitem i {
+  font-size: 1.1em;
+  color: #c0bbbb;
+}
+.aboutmeitem span {
+  margin-left: 2em;
+}
+#suggest {
+  text-align: left;
+  margin-top: 3em;
+}
+.suggestitem {
+  font-size: 1.1em;
+  border-bottom: 1px solid #cacaca;
+  padding: 0 1.4em;
+  line-height: 2.8em;
+  height: 2.8em;
+  background-color: white;
+}
+.suggestitem i {
+  font-size: 1.1em;
+  color: #c0bbbb;
+}
+.suggestitem span {
+  margin-left: 2em;
+}

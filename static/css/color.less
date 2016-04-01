@@ -1,0 +1,22 @@
+@maincolor:#ff8400;
+@bgcolor:#edebeb;
+@line-color:#cacaca;
+@font-color:#898989;
+@font-color-light:#c0bbbb;
+
+body{
+  background-color: @bgcolor;
+  box-sizing: border-box;
+}
+
+.clear{
+  zoom: 1;
+  &:after{
+    content: '';
+    clear: both;
+    display: block;
+  }
+
+}
+
+

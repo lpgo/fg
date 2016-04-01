@@ -1,0 +1,92 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.item {
+  background-color: white;
+  border-bottom: 1px solid #cacaca;
+  font-size: 1.0em;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+}
+.item input {
+  font-size: 1.1em;
+  border: none;
+  outline: none;
+}
+.item i {
+  padding-right: 1em;
+  color: #898989;
+  font-size: 1.1em;
+}
+.subtitle {
+  padding-left: 2em;
+  font-weight: bolder;
+  line-height: 1em;
+  background-color: #edebeb;
+  padding-top: 0.3em;
+  padding-bottom: 0.8em;
+}
+.subtitle .subtitletext div {
+  padding-top: 0.5em;
+}
+.leftimtetext {
+  float: left;
+  font-size: 1.1em;
+}
+.rightitemtext {
+  float: right;
+  font-size: 1.1em;
+}
+#item2 {
+  padding-right: 3.3em;
+}
+#footer {
+  margin-top: 2em;
+  color: #898989;
+}
+#footer a {
+  font-size: 0.8em;
+  color: #2864fe;
+  text-decoration: none;
+}
+#chepai {
+  font-size: 0.98em;
+}
+.title {
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+  color: #c0bbbb;
+}
+#button {
+  text-align: center;
+  margin-top: 1.6em;
+}
+#button button {
+  color: white;
+  background-color: #ff8400;
+  width: 70%;
+  height: 2.4em;
+  border: none;
+  border-radius: 0.4em;
+  font-size: 1.2em;
+}
+#starticon {
+  color: #b3e45d;
+}
+#endicon {
+  color: #ff8400;
+}
