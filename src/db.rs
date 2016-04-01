@@ -39,6 +39,12 @@ impl ToDoc for model::Trip {
 	}
 }
 
+impl ToDoc for model::Line {
+    fn get_name() -> &'static str {
+        "Line"
+    }
+}
+
 pub struct Dao(Arc<DatabaseInner>);
 
 impl Dao {
@@ -92,6 +98,28 @@ impl Dao {
             }
         } 
         data
+    }
+
+    pub fn get_all_lines(&self) -> Vec<model::Line> {
+        let coll = self.0.collection(model::Line::get_name());
+        coll.find(None,None).map(|cursor|{
+            cursor.map(|result| {
+                let value = result.unwrap();
+                model::de_bson::<model::Line>(value).unwrap()
+            }).collect()
+        }).unwrap()
+    }
+
+    pub fn get_hot_lines(&self) -> Vec<model::Line> {
+        let coll = self.0.collection(model::Line::get_name());
+         let mut doc = Document::new();
+        doc.insert("hot",true);
+        coll.find(Some(doc),None).map(|cursor|{
+            cursor.map(|result| {
+                let value = result.unwrap();
+                model::de_bson::<model::Line>(value).unwrap()
+            }).collect()
+        }).unwrap()
     }
    
     //db.Trip.update({"owner_id":"openid"},{"$set":{"status":"Finish"}})

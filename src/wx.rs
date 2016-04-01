@@ -8,7 +8,7 @@ use urlencoded::{UrlEncodedBody,UrlEncodedQuery};
 use iron::{status,Url};
 use iron::modifiers::Redirect;
 use db::Dao;
-use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType};
+use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo};
 use service::Service;
 use mongodb::db::ThreadedDatabase;
 use session::{Session,SessionContext};
@@ -37,7 +37,7 @@ pub struct WxInstance {
 	token:       String,
 	pub access_token: String,
              pub access_token_expires:u32,
-	open_id:      String,
+	openid:      String,
 }
 
 //#[derive(Serialize, Deserialize, Debug)]
@@ -85,7 +85,7 @@ impl WxInstance {
                 let appid = ConfigManager::get_config_str("app","appid");
                 let secret = ConfigManager::get_config_str("app","appsecret");
                 let token = ConfigManager::get_config_str("app","token");
-	   let mut instance =  WxInstance{appid:appid,secret:secret,token:token,access_token:String::new(),access_token_expires:0u32,open_id:String::new()};
+	   let mut instance =  WxInstance{appid:appid,secret:secret,token:token,access_token:String::new(),access_token_expires:0u32,openid:String::new()};
                 instance.get_access_token();
                 instance
 	}
@@ -222,7 +222,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                 if let Ok(seat) = seat_count.parse::<u32>() {
                     if let Ok(start) = Local.datetime_from_str(start_time, "%Y-%m-%d %H:%M:%S") {
                         //start.with_timezone(&UTC);
-                        let t = Trip::new(login_status.open_id.clone(),id,start,seat);
+                        let t = Trip::new(login_status.openid.clone(),id,start,seat);
                         service.add_trip(t);
                         return Ok(Response::with((status::Ok,"publish Trip sucess!")));
                     }
@@ -261,33 +261,33 @@ pub fn get_trips(req:&mut Request) -> IronResult<Response> {
 /*
 pub fn login(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
-    let mut open_id = String::new();
+    let mut openid = String::new();
     if let Ok(ref hashmap) = req.get_ref::<UrlEncodedBody>() {
-        open_id = hashmap.get("open_id").unwrap()[0].to_owned();            
+        openid = hashmap.get("openid").unwrap()[0].to_owned();            
     }
-    if open_id.is_empty() {
+    if openid.is_empty() {
         let s = r#"{"success":false,"msg":"parameters errror"}"#;
         Ok(Response::with((status::Ok,s)))
     } else {
-        match service.get_user_by_id(&open_id) {
+        match service.get_user_by_id(&openid) {
             (Some(o),None) => {
                 let s = r#"{"success":true,"type":"owner"}"#;
                 let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{open_id:o.open_id,user_type:UserType::Owner,name:o.name};
+                let login_status = LoginStatus{openid:o.openid,user_type:UserType::Owner,name:o.name};
                 set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
             (None,Some(p)) => {
                 let s = r#"{"success":true,"type":"passenger"}"#;
                 let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{open_id:p.open_id,user_type:UserType::Passenger,name:p.name};
+                let login_status = LoginStatus{openid:p.openid,user_type:UserType::Passenger,name:p.name};
                 set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
             (Some(o),Some(p)) => {
                 let s = r#"{"success":true,"type":"owner"}"#;
                 let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{open_id:o.open_id,user_type:UserType::Owner,name:o.name};
+                let login_status = LoginStatus{openid:o.openid,user_type:UserType::Owner,name:o.name};
                 set_session::<LoginStatus>(req, &mut res, login_status);
                 Ok(res)
             },
@@ -315,7 +315,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
             let oid = &hashmap.get("oid").unwrap()[0];    
-            if let Ok(payid) = service.apply_trip(oid,&login_status.open_id,ip) {
+            if let Ok(payid) = service.apply_trip(oid,&login_status.openid,ip) {
                 let json_replay = jsonway::object(|j|{
                     j.set("success",true);
                     j.set("payid",payid.clone());
@@ -328,6 +328,16 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
         },
         Err(_) => Ok(Response::with((status::Ok,"{success:false}")))
     }
+}
+
+pub fn get_lines(req: &mut Request) -> IronResult<Response> {
+    let service = req.get::<PersistRead<Service>>().unwrap();
+    Ok(Response::with((status::Ok,service.get_lines())))
+}
+
+pub fn get_hot_lines(req: &mut Request) -> IronResult<Response> {
+    let service = req.get::<PersistRead<Service>>().unwrap();
+    Ok(Response::with((status::Ok,service.get_hot_lines())))
 }
 
 pub fn test(req: &mut Request) -> IronResult<Response> {
@@ -377,7 +387,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
                 let mut login_status = LoginStatus::default();
                 login_status.web_token = Some(token);
                 login_status.refresh_token = res.refresh_token;
-                login_status.open_id = res.openid.unwrap_or(String::new());
+                login_status.openid = res.openid.unwrap_or(String::new());
                 warn!("{:?}",login_status);
                 set_session::<LoginStatus>(req, &mut resp, login_status);
                 Some(())
@@ -388,6 +398,25 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
     });
 
     res_template!("index",data,resp)
+}
+
+pub fn my_info_template(req: &mut Request) -> IronResult<Response> {
+    let mut resp = Response::new();
+    let login_status = get_session::<LoginStatus>(req).unwrap();
+    let user_info = get_wx_user(&login_status.web_token.unwrap(), &login_status.openid);
+    res_template!("myInfo",user_info,resp)
+}
+
+
+pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
+    let client = pay::ssl_client();
+    let url = format!("https://api.weixin.qq.com/sns/userinfo?access_token={}&openid={}&lang=zh_CN",token,openid);
+    client.get(&url).send().and_then(|mut res|{
+        let mut buf = String::new();
+        res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
+    }).and_then(|buf|{
+        serde_json::from_str::<WxUserInfo>(&buf).map_err(|err| hyper::Error::Method)
+    }).unwrap()
 }
 
 

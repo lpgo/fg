@@ -53,9 +53,12 @@ fn main() {
     router.post("/publishTrip",wx::publish_trip);
     router.post("/getTrips", wx::get_trips);
     router.post("/applyTrip",wx::apply_trip);
+    router.post("/getLines", wx::get_lines);
+    router.post("/getHotLines",wx::get_hot_lines);
 
     //template
     router.get("/pinche/index.html",wx::index_template);
+    router.get("/pinche/myInfo", wx::my_info_template);
 
     router.get("/favicon.ico",wx::ico);
     router.get("/",wx::index);

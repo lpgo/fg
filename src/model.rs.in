@@ -2,7 +2,7 @@
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
 pub struct Owner {
     _id:Option<Bson>,
-    pub open_id: String,
+    pub openid: String,
     pub name :Option<String>,
     pub tel:String,
     pub plate_number:String,
@@ -12,7 +12,7 @@ pub struct Owner {
 //乘客
 pub struct Passenger {
     _id:Option<Bson>,
-    pub open_id: String,
+    pub openid: String,
     pub tel:String,
     pub name:Option<String>
 }
@@ -49,7 +49,8 @@ pub struct Line {
      id:u32,
      start:String,
      end:String,
-     price:f32
+     price:f32,
+     hot : bool
 }
 
 //统一下单返回结果
@@ -82,6 +83,19 @@ pub struct ApiResult {
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
+pub struct WxUserInfo {
+    openid:String,
+    nickname: String,
+    sex:String,
+    province:String,
+    city:String,
+    country:String,
+    headimgurl: String,
+    privilege:Vec<String>,
+    unionid:String
+}
+
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub enum UserType {
     Owner,
     Passenger,
@@ -98,7 +112,7 @@ impl Default for UserType {
 #[derive(PartialEq, Debug, Serialize, Deserialize,Clone,Default)]
 pub struct LoginStatus {
     pub user_type : UserType,
-    pub open_id : String,
+    pub openid : String,
     pub name : Option<String>,
     pub web_token : Option<String>,
     pub refresh_token : Option<String>
@@ -114,13 +128,13 @@ impl Owner {
                 car_type:car_type,
                 tel:tel,
                 plate_number:plate_number,
-                open_id:String::new()}
+                openid:String::new()}
     }
 }
 
 impl Passenger {
     pub fn new(tel:String) -> Passenger {
-        Passenger{_id:None,name:None,tel:tel,open_id:String::new()}
+        Passenger{_id:None,name:None,tel:tel,openid:String::new()}
     }
 }
 

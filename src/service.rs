@@ -32,9 +32,9 @@ impl Service {
 		Result::Ok(())
 	}
 
-	pub fn get_user_by_id(&self,open_id:&String) -> (Option<Owner>,Option<Passenger>) {
-		let o = self.0.get_by_openid::<Owner>(open_id).ok();
-		let p = self.0.get_by_openid::<Passenger>(open_id).ok();
+	pub fn get_user_by_id(&self,openid:&String) -> (Option<Owner>,Option<Passenger>) {
+		let o = self.0.get_by_openid::<Owner>(openid).ok();
+		let p = self.0.get_by_openid::<Passenger>(openid).ok();
 		(o,p)
 	}
 
@@ -43,6 +43,18 @@ impl Service {
 		info!("{:?}",data);
 		serde_json::to_string(&data).unwrap()
 	}
+
+	pub fn get_lines(&self) -> String {
+		let data = self.0.get_all_lines();
+		serde_json::to_string(&data).unwrap()
+	}
+
+	pub fn get_hot_lines(&self) -> String {
+		let data = self.0.get_hot_lines();
+		serde_json::to_string(&data).unwrap()
+	}
+
+
 
 	//todo
 	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String,()> {
