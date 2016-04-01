@@ -404,7 +404,7 @@ pub fn my_info_template(req: &mut Request) -> IronResult<Response> {
     let mut resp = Response::new();
     let login_status = get_session::<LoginStatus>(req).unwrap();
     let user_info = get_wx_user(&login_status.web_token.unwrap(), &login_status.openid);
-    res_template!("myInfo",user_info,resp)
+    res_template!("profile",user_info,resp)
 }
 
 
