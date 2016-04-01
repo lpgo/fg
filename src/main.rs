@@ -77,7 +77,7 @@ fn main() {
     middleware.link(persist_instance);
     middleware.link(PersistRead::<service::Service>::both(service.clone()));
     middleware.link(PersistState::<session::SessionContext>::both(session_context));
-    middleware.link_after(session::CheckSession);
+    //middleware.link_after(session::CheckSession);
 
     env_logger::init().unwrap();
     let mut hbse = HandlebarsEngine::new2();

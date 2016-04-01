@@ -86,13 +86,14 @@ pub struct ApiResult {
 pub struct WxUserInfo {
     openid:String,
     nickname: String,
-    sex:String,
-    province:String,
+    sex:i32,
+    language:String,
     city:String,
+    province:String,
     country:String,
     headimgurl: String,
     privilege:Vec<String>,
-    unionid:String
+    unionid:Option<String>
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]

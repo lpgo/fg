@@ -417,6 +417,7 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
         let mut buf = String::new();
         res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
     }).and_then(|buf|{
+        warn!("---------{}",buf);
         serde_json::from_str::<WxUserInfo>(&buf).map_err(|err| hyper::Error::Method)
     }).unwrap()
 }
