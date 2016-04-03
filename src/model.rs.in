@@ -3,7 +3,6 @@
 pub struct Owner {
     _id:Option<Bson>,
     pub openid: String,
-    pub name :Option<String>,
     pub tel:String,
     pub plate_number:String,
     pub car_type : String
@@ -13,8 +12,7 @@ pub struct Owner {
 pub struct Passenger {
     _id:Option<Bson>,
     pub openid: String,
-    pub tel:String,
-    pub name:Option<String>
+    pub tel:String
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -124,18 +122,18 @@ impl Key for LoginStatus {
 }
 
 impl Owner {
-    pub fn new(tel:String,car_type:String,plate_number:String) -> Owner {
-       Owner{_id:None,name:None,
+    pub fn new(tel:String,car_type:String,plate_number:String,openid:String) -> Owner {
+       Owner{_id:None,
                 car_type:car_type,
                 tel:tel,
                 plate_number:plate_number,
-                openid:String::new()}
+                openid:openid}
     }
 }
 
 impl Passenger {
-    pub fn new(tel:String) -> Passenger {
-        Passenger{_id:None,name:None,tel:tel,openid:String::new()}
+    pub fn new(tel:String,openid:String) -> Passenger {
+        Passenger{_id:None,tel:tel,openid:openid}
     }
 }
 

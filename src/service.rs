@@ -6,8 +6,47 @@ use chrono::UTC;
 use serde_json;
 use pay::{self,PrePay};
 use config::ConfigManager;
+use std::{io,fmt,error};
+use hyper;
+use persist;
+use urlencoded;
 
 pub struct Service(Dao);
+
+ #[derive(Debug)]
+pub enum ServiceError {
+    IoError(io::Error),
+    HyperError(hyper::Error),
+    ParameterError(String),
+    SerdeJsonError(serde_json::Error),
+    PersistentError(persist::PersistentError),
+    UrlDecodingError(urlencoded::UrlDecodingError),
+    Other(String)
+
+}
+
+impl fmt::Display for ServiceError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+        	ServiceError::IoError(ref e) => e.fmt(f),
+        	ServiceError::HyperError(ref e) => e.fmt(f),
+        	ServiceError::ParameterError(ref s) => write!(f,"{} can not find!",s),
+            	ServiceError::SerdeJsonError(ref e) => e.fmt(f),
+            	ServiceError::PersistentError(ref e) => e.fmt(f),
+            	ServiceError::UrlDecodingError(ref e) => e.fmt(f),
+            	ServiceError::Other(ref s) => write!(f, "{}",s)
+         }
+     }
+}
+
+impl error::Error for ServiceError {
+	fn description(&self) -> &str {
+		"all error in service"
+	}
+	fn cause(&self) -> Option<&error::Error> {
+		None
+	}
+}
 
 
 

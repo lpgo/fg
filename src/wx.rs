@@ -9,7 +9,7 @@ use iron::{status,Url};
 use iron::modifiers::Redirect;
 use db::Dao;
 use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo};
-use service::Service;
+use service::{Service,ServiceError};
 use mongodb::db::ThreadedDatabase;
 use session::{Session,SessionContext};
 use hbs::Template;
@@ -18,6 +18,7 @@ use chrono::offset::local::Local;
 use chrono::offset::TimeZone;
 use std::collections::HashMap;
 use std::io::Read;
+use std::result;
 use std::marker::{Sync,Send};
 use jsonway;
 use pay;
@@ -25,11 +26,8 @@ use serde_json;
 use hyper;
 use config::ConfigManager;
 
-#[derive(Debug, Clone, RustcDecodable)]
-struct MyStructure {
-    a: String,
-    b: Option<String>,
-}
+pub type Result<T> = result::Result<T, ServiceError>;
+
 #[derive(Clone,Debug)]
 pub struct WxInstance {
 	appid:       String,
@@ -90,7 +88,7 @@ impl WxInstance {
                 instance
 	}
 
-	pub fn check(&self,timestamp:&str, nonce:&str, echostr:&str, signature:&str) -> Result<String,&str> {
+	pub fn check(&self,timestamp:&str, nonce:&str, echostr:&str, signature:&str) -> Result<String> {
                 	let mut strs:Vec<&str> = vec![&self.token,nonce,timestamp];
                 	println!("strs is {:?}", strs);
                 	quickersort::sort(&mut strs[..]);
@@ -101,9 +99,9 @@ impl WxInstance {
                         let hh = m.hexdigest();
                         println!("sha1 result is {}", hh);
                         if &hh == signature {
-                        	Result::Ok(echostr.to_string())
+                        	Ok(echostr.to_string())
                         } else {
-                        	Result::Err("check error!")
+                        	Err(ServiceError::Other("check error!".to_string()))
                         }
 	}
 
@@ -170,7 +168,7 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
             let signature = &hashmap.get("signature").unwrap()[0];
             match instance.check(timestamp,nonce,echostr,signature) {
                 Ok(echo) => Ok(Response::with((status::Ok,echo))),
-                Err(err) => Ok(Response::with((status::Ok,err)))
+                Err(_) => Ok(Response::with((status::Ok,"check error")))
             }
         },
         Err(_) => Ok(Response::with((status::Ok,"error parameters!")))
@@ -178,6 +176,7 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
 }
 
 pub fn register_owner(req:&mut Request) -> IronResult<Response> {
+    /*
 	let service = req.get::<PersistRead<Service>>().unwrap();
 	match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
@@ -192,8 +191,9 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
             service.add_owner(owner).unwrap();
             Ok(Response::with((status::Ok,"add owner sucess!")))
         },
-        Err(_) => Ok(Response::with((status::Ok,"error parameters!")))
-    }
+        Err(_) => Ok(Response::with((status::Ok,"error parameters    }
+    */
+    Ok(Response::with((status::Ok,"error parameters")))
 }
 
 pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
@@ -237,20 +237,29 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
 
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
+    let mut login_status = get_session::<LoginStatus>(req).unwrap();
+    let mut success = false;
     match req.get_ref::<UrlEncodedBody>() {
-        Ok(ref hashmap) => {
-            let name = &hashmap.get("name").unwrap()[0];            
+        Ok(ref hashmap) => {       
             let tel = &hashmap.get("tel").unwrap()[0];
             let code = &hashmap.get("code").unwrap()[0];
-            
-            let mut p = Passenger::new(tel.to_owned());
-            p.name = Some(name.to_owned());
-
+            //to-do validate code 
+            let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
             service.add_passenger(p).unwrap();
-            Ok(Response::with((status::Ok,"add Passenger sucess!")))
+            success = true;
         },
-        Err(_) => Ok(Response::with((status::Ok,"error parameters!")))
+        Err(_) => {}
+    };
+    if success {
+        login_status.user_type  = UserType::Passenger;
+        let mut resp = Response::new();
+        set_session::<LoginStatus>(req, &mut resp, login_status);
+        let data = model::make_data();
+        res_template!("index",data,resp)
+    } else  {
+        Ok(Response::with((status::Ok,"validate passenger faile")))
     }
+    
 }
 
 pub fn get_trips(req:&mut Request) -> IronResult<Response> {
@@ -360,52 +369,41 @@ pub fn index(req: &mut Request) -> IronResult<Response> {
 
 pub fn index_template(req: &mut Request) -> IronResult<Response> {
     let data = model::make_data();
+    let mut resp = Response::new();
+    req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
+        &hashmap.get("code").unwrap()[0]
+    }).and_then(|code|{
+        get_web_token(code)        
+    }).and_then(|api_result|{
+        let mut login_status = LoginStatus::default();
+        login_status.web_token = api_result.access_token;
+        login_status.refresh_token = api_result.refresh_token;
+        login_status.openid = api_result.openid.unwrap_or(String::new());
+        set_session::<LoginStatus>(req, &mut resp, login_status);
+        Ok(())
+    });
+    res_template!("index",data,resp)
+}
 
-    let mut code = String::new();
-
-    match req.get_ref::<UrlEncodedQuery>() {
-        Ok(ref hashmap) => {
-            code = hashmap.get("code").unwrap()[0].clone();
-        },
-        Err(_) => return Ok(Response::with((status::Ok,"error parameters!")))
-    };
+pub fn get_web_token(code:&str) -> Result<ApiResult> {
     let appid = ConfigManager::get_config_str("app", "appid");
     let secret = ConfigManager::get_config_str("app", "appsecret");
 
-    let mut resp = Response::new();
-
     let client = pay::ssl_client();
     let url = format!("https://api.weixin.qq.com/sns/oauth2/access_token?appid={}&secret={}&code={}&grant_type=authorization_code",appid,secret,code);
-    warn!("url is {}",url);
-    client.get(&url).send().and_then(|mut res|{
+    client.get(&url).send().map_err(|err|ServiceError::HyperError(err)).and_then(|mut res|{
         let mut buf = String::new();
-        res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
+        res.read_to_string(& mut buf).map(|_| buf).map_err(|err|ServiceError::IoError(err))
     }).and_then(|buf|{
-        serde_json::from_str::<ApiResult>(&buf).map_err(|err| hyper::Error::Method)
-    }).ok().and_then(|res|{  
-           if let Some(token) = res.access_token {
-                let mut login_status = LoginStatus::default();
-                login_status.web_token = Some(token);
-                login_status.refresh_token = res.refresh_token;
-                login_status.openid = res.openid.unwrap_or(String::new());
-                warn!("{:?}",login_status);
-                set_session::<LoginStatus>(req, &mut resp, login_status);
-                Some(())
-           } else {
-                 warn!("get access token error!!");
-                 None
-           }
-    });
-
-    res_template!("index",data,resp)
+        serde_json::from_str::<ApiResult>(&buf).map_err(|err| ServiceError::SerdeJsonError(err))
+    })
 }
+
 
 pub fn my_info_template(req: &mut Request) -> IronResult<Response> {
     let mut resp = Response::new();
     let login_status = get_session::<LoginStatus>(req).unwrap();
-    warn!("{:?}",login_status);
     let user_info = get_wx_user(&login_status.web_token.unwrap(), &login_status.openid);
-    warn!("{:?}",user_info);
     res_template!("profile",user_info,resp)
 }
 
@@ -417,7 +415,6 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
         let mut buf = String::new();
         res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
     }).and_then(|buf|{
-        warn!("---------{}",buf);
         serde_json::from_str::<WxUserInfo>(&buf).map_err(|err| hyper::Error::Method)
     }).unwrap()
 }
@@ -452,4 +449,15 @@ pub fn get_session<K:Key>(req: & mut Request) -> Option<K::Value> where K::Value
         None
     }
 }
+
+/*
+pub fn get_mut_session<'a,K:Key>(req: &'a mut Request) -> Option<&'a mut K::Value> where K::Value:Clone {
+    let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
+    let sc = sc1.read().unwrap();
+    let session = sc.get_mut_session(req);
+    session.and_then(|s|{
+        s.data.get_mut::<K>()
+    })
+}
+*/
 
