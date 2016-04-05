@@ -25,6 +25,7 @@ use pay;
 use serde_json;
 use hyper;
 use config::ConfigManager;
+use rustc_serialize::json;
 
 pub type Result<T> = result::Result<T, ServiceError>;
 
@@ -310,32 +311,37 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
 */
 pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
-    let mut can = false;
-    let mut  login_status:LoginStatus = LoginStatus::default();
-    if let Some(status) = get_session::<LoginStatus>(req) {
-            can = true;
-            login_status = status.clone();
-    }
-    if !can {
-        return  Ok(Response::with((status::Ok,"{success:false,login:false}")));
-    }
     let ip = format!("{}",req.remote_addr);
-    let service = req.get::<PersistRead<Service>>().unwrap();
-    match req.get_ref::<UrlEncodedBody>() {
-        Ok(ref hashmap) => {
-            let oid = &hashmap.get("oid").unwrap()[0];    
-            if let Ok(payid) = service.apply_trip(oid,&login_status.openid,ip) {
-                let json_replay = jsonway::object(|j|{
+
+    let replay = get_session::<LoginStatus>(req).and_then(|login_status|{
+        if login_status.user_type != UserType::Anonymous {
+            Some(login_status)
+        } else {
+            None
+        }
+    }).ok_or(ServiceError::NoLogin).and_then(|login_status|{
+        req.get::<PersistRead<Service>>().map(|service|(service,login_status)).map_err(|err|ServiceError::PersistentError(err))
+    }).and_then(|(service,login_status)|{
+        req.get_ref::<UrlEncodedBody>().map(|hashmap|(service,login_status,hashmap)).map_err(|err|ServiceError::UrlDecodingError(err))
+    }).and_then(|(service,login_status,hashmap)|{
+        let oid  = &hashmap.get("oid").unwrap()[0];
+        service.apply_trip(oid,&login_status.openid,ip)
+    }).map(|payid|{
+         jsonway::object(|j|{
                     j.set("success",true);
-                    j.set("payid",payid.clone());
-                });
-                Ok(Response::with((status::Ok,format!("{}",payid))))
-            } else {
-                Ok(Response::with((status::Ok,"{success:false}")))
-            }  
-           
+                    j.set("payid",payid);
+            })
+    });
+
+    match replay {
+        Ok(rep) => {
+            let r = json::encode(&rep.unwrap()).unwrap();
+            Ok(Response::with((status::Ok,format!("{}",r))))
         },
-        Err(_) => Ok(Response::with((status::Ok,"{success:false}")))
+        Err(err) => {
+                        warn!("{}",err);
+                        Ok(Response::with((status::Ok,"{success:false}")))
+        }
     }
 }
 

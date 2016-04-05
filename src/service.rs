@@ -21,6 +21,7 @@ pub enum ServiceError {
     SerdeJsonError(serde_json::Error),
     PersistentError(persist::PersistentError),
     UrlDecodingError(urlencoded::UrlDecodingError),
+    NoLogin,
     Other(String)
 
 }
@@ -34,6 +35,7 @@ impl fmt::Display for ServiceError {
             	ServiceError::SerdeJsonError(ref e) => e.fmt(f),
             	ServiceError::PersistentError(ref e) => e.fmt(f),
             	ServiceError::UrlDecodingError(ref e) => e.fmt(f),
+            	ServiceError::NoLogin => write!(f,"you are not  login!"),
             	ServiceError::Other(ref s) => write!(f, "{}",s)
          }
      }
@@ -96,7 +98,7 @@ impl Service {
 
 
 	//todo
-	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String,()> {
+	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String,ServiceError> {
 		let appid = ConfigManager::get_config_str("app", "appid");
 		let mch_id = ConfigManager::get_config_str("app", "mchid");
 		let msg = "pinchefei".to_string();
@@ -104,7 +106,7 @@ impl Service {
 		if let Ok(result) = pay::pre_pay(prepay) {
 			Ok(result.prepay_id.clone())
 		} else {
-			Err(())
+			Err(ServiceError::Other("applay trip error".to_string()))
 		}
 	}
 
