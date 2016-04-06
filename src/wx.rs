@@ -374,7 +374,7 @@ pub fn index(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn index_template(req: &mut Request) -> IronResult<Response> {
-    let data = model::make_data();
+    let mut data = model::make_data();
     let mut resp = Response::new();
     req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
         &hashmap.get("code").unwrap()[0]
@@ -384,7 +384,23 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
         let mut login_status = LoginStatus::default();
         login_status.web_token = api_result.access_token;
         login_status.refresh_token = api_result.refresh_token;
-        login_status.openid = api_result.openid.unwrap_or(String::new());
+        //login_status.openid = api_result.openid.unwrap_or(String::new());
+
+        api_result.openid.and_then(|openid|{
+            req.get::<PersistRead<Service>>().ok().map(|service|(service,openid))
+        }).and_then(|(service,openid)|{
+            let (o,p) = service.get_user_by_id(&openid);
+            p.map(|_|{
+                login_status.user_type = UserType::Passenger;
+                data.insert("userType".to_string(), serde_json::value::to_value(&"Passenger"))
+            });
+            o.map(|_|{
+                login_status.user_type = UserType::Owner;
+                data.insert("userType".to_string(), serde_json::value::to_value(&"Owner"))
+            });
+            Some(())
+        });
+
         set_session::<LoginStatus>(req, &mut resp, login_status);
         Ok(())
     });
