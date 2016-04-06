@@ -76,6 +76,7 @@ impl Service {
 	pub fn get_user_by_id(&self,openid:&String) -> (Option<Owner>,Option<Passenger>) {
 		let o = self.0.get_by_openid::<Owner>(openid).ok();
 		let p = self.0.get_by_openid::<Passenger>(openid).ok();
+		warn!("openid is {}--{:?},{:?}",openid,o,p);
 		(o,p)
 	}
 
