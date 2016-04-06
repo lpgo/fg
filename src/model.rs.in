@@ -1,5 +1,5 @@
 //车主
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub struct Owner {
     _id:Option<Bson>,
     pub openid: String,
@@ -7,8 +7,8 @@ pub struct Owner {
     pub plate_number:String,
     pub car_type : String
 }
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
 //乘客
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub struct Passenger {
     _id:Option<Bson>,
     pub openid: String,
@@ -114,7 +114,9 @@ pub struct LoginStatus {
     pub openid : String,
     pub name : Option<String>,
     pub web_token : Option<String>,
-    pub refresh_token : Option<String>
+    pub refresh_token : Option<String>,
+    pub passenger:Option<Passenger>,
+    pub owner:Option<Owner>
 }
 
 impl Key for LoginStatus {

@@ -177,24 +177,25 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
 }
 
 pub fn register_owner(req:&mut Request) -> IronResult<Response> {
-    /*
-	let service = req.get::<PersistRead<Service>>().unwrap();
-	match req.get_ref::<UrlEncodedBody>() {
-        Ok(ref hashmap) => {
-            let name = &hashmap.get("name").unwrap()[0];
-            let carType = &hashmap.get("car_type").unwrap()[0];
-            let tel = &hashmap.get("tel").unwrap()[0];
-            let code = &hashmap.get("code").unwrap()[0];
+        let service = req.get::<PersistRead<Service>>().unwrap();
+        let mut login_status = get_session::<LoginStatus>(req).unwrap();
+   
+        req.get_ref::<UrlEncodedBody>().and_then(|hashmap|{
             let plate_number = &hashmap.get("plate_number").unwrap()[0];
-            
-            let mut owner = Owner::new(tel.to_owned(),carType.to_owned(),plate_number.to_owned());
-            owner.name = Some(name.to_owned());
-            service.add_owner(owner).unwrap();
-            Ok(Response::with((status::Ok,"add owner sucess!")))
-        },
-        Err(_) => Ok(Response::with((status::Ok,"error parameters    }
-    */
-    Ok(Response::with((status::Ok,"error parameters")))
+            let car_type = &hashmap.get("car_type").unwrap()[0];
+            let openid = login_status.openid.clone();
+            let p = login_status.passenger.as_ref().unwrap();
+            let owner = Owner::new(p.tel.clone(),car_type.clone(),plate_number.clone(),openid);
+            service.add_owner(owner.clone());
+            login_status.owner = Some(owner);
+            Ok(())
+        });
+
+        let mut resp = Response::new();
+        set_session::<LoginStatus>(req, &mut resp, login_status);
+        let data = model::make_data();
+        res_template!("index",data,resp)
+   
 }
 
 pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
@@ -240,14 +241,19 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
     let mut success = false;
+    let mut to_owner = false;
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {       
             let tel = &hashmap.get("tel").unwrap()[0];
             let code = &hashmap.get("code").unwrap()[0];
+            let owner = &hashmap.get("owner").unwrap()[0];
             //to-do validate code 
             let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
             service.add_passenger(p).unwrap();
             success = true;
+            if !owner.is_empty() {
+                to_owner = true;
+            }
         },
         Err(_) => {}
     };
@@ -256,7 +262,13 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
         let data = model::make_data();
-        res_template!("index",data,resp)
+        if to_owner {
+            let domain = ConfigManager::get_config_str("app", "domain");
+            let urlstr = domain+"/static/driverregister.html";
+            redirect!(&urlstr)
+        } else {
+            res_template!("index",data,resp)
+        }
     } else  {
         Ok(Response::with((status::Ok,"validate passenger faile")))
     }
@@ -391,12 +403,14 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
             req.get::<PersistRead<Service>>().ok().map(|service|(service,openid))
         }).and_then(|(service,openid)|{
             let (o,p) = service.get_user_by_id(&openid);
-            p.map(|_|{
+            p.map(|passenger|{
                 login_status.user_type = UserType::Passenger;
+                login_status.passenger = Some(passenger);
                 data.insert("userType".to_string(), serde_json::value::to_value(&"Passenger"))
             });
-            o.map(|_|{
+            o.map(|owner|{
                 login_status.user_type = UserType::Owner;
+                login_status.owner = Some(owner);
                 data.insert("userType".to_string(), serde_json::value::to_value(&"Owner"))
             });
             Some(())
