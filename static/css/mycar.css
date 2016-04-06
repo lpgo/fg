@@ -1,0 +1,100 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
+body {
+  width: 100%;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+}
+#content {
+  background-color: white;
+  margin: 3em 2em;
+  border: 1px solid #ff8400;
+  border-radius: 4px;
+}
+#content span {
+  margin-left: 2em;
+  color: #898989;
+}
+#content #carbrand {
+  padding: 0.3em 1em;
+  height: 3em;
+  line-height: 3em;
+  border-bottom: 1px solid #edebeb;
+}
+#content #carnumber {
+  padding: 0.3em 1em;
+  height: 3em;
+  line-height: 3em;
+}
+#carnum {
+  margin-left: 3em !important;
+}
+#modify {
+  position: absolute;
+  left: 50%;
+  margin-left: -50px;
+  bottom: 40px;
+  text-align: center;
+}
+#modify a {
+  text-decoration: none;
+  color: #898989;
+}
+#modify img {
+  display: block;
+  margin: 0 auto;
+  margin-top: 2em;
+  width: 30px;
+}

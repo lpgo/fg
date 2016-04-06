@@ -1,0 +1,75 @@
+@import "color";
+#subtitle{
+  text-align: center;
+  span{
+    color: @maincolor;
+  }
+  font-size: 0.84em;
+  padding: 3em 2em 0 2em;
+}
+#content{
+  margin-top: 2.1em;
+}
+#modify {
+  position: absolute;
+  left: 50%;
+  margin-left: -20px;
+}
+#confirmtn{
+    width: 80%;
+    height: 3em;
+    margin-left: 10%;
+    font-size: 1.1em;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    background-color: @maincolor;
+  }
+@media screen and (min-width:350px) and (max-width:1000px) {
+
+  #confirmtn {
+    width: 85%;
+    height: 3em;
+    margin-left: 7%;
+    font-size: 1.1em;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    background-color: #ff8400;
+  }
+}
+#content{
+  select {
+    margin-left: 2em;
+    color: black;
+    background: transparent;
+    width: 100px;
+    outline: none;
+    border: none;
+    font-size: 16px;
+    height: 2em;
+    -webkit-appearance: none; /*for chrome*/
+  }
+}
+#carnumber{
+  select{
+    margin-left: 3em;
+    color: white;
+    background: @maincolor;
+    width: 50px;
+    outline: none;
+    border: none;
+    border-radius: 0;
+    font-size: 16px;
+    height: 1.3em;
+    line-height: 1.3em;
+    vertical-align:middle;
+    -webkit-appearance: none; /*for chrome*/
+  }
+  input{
+    border: none;
+    width: 5em;
+    color: black;
+    outline: none;
+  }
+}

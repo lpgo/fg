@@ -10,6 +10,42 @@ body {
   clear: both;
   display: block;
 }
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
 .fl {
   float: left;
 }
@@ -22,8 +58,8 @@ body {
 }
 #title {
   text-align: center;
-  height: 2em;
-  line-height: 2em;
+  height: 2.5em;
+  line-height: 2.5em;
   font-size: 1.1em;
   background-color: white;
   color: #c0bbbb;

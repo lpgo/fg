@@ -1,0 +1,179 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
+body {
+  background-color: white;
+}
+p {
+  margin-bottom: 0.5em;
+  margin-top: 0.2em;
+}
+#gather {
+  padding: 0.6em 2em;
+  border-bottom: 1px solid #cacaca;
+}
+#gathertimemonthday {
+  font-size: 1.5em;
+}
+#gathertimehour {
+  font-size: 1.2em;
+}
+#gatherlocation {
+  color: #898989;
+  font-size: 1.3em;
+}
+#line {
+  padding: 1.2em 2em;
+  border-bottom: 1px solid #cacaca;
+}
+#linemoney {
+  border-left: 2px dashed brown;
+}
+#linemoney span {
+  font-size: 1.4em;
+}
+#linemoney #linemoneynum {
+  font-size: 1.8em;
+  color: #ff8400;
+}
+#linemoney #remainsit {
+  font-size: 1.3em;
+  color: #898989;
+}
+#linestartlocation {
+  font-size: 1.8em;
+  margin-left: 1em;
+  color: #898989;
+}
+#lineendlocation {
+  font-size: 1.8em;
+  margin-left: 1em;
+  color: #898989;
+}
+#linedetail {
+  font-size: 1.2em;
+  padding: 1em 2em;
+  border-bottom: 1px solid #cacaca;
+}
+#carbrandright {
+  display: inline-block;
+}
+#carbrand {
+  font-size: 1.7em;
+}
+#linedetailfooter span {
+  margin-left: 1em;
+}
+#lineinfo {
+  padding: 1em 1.3em;
+  font-size: 1.5em;
+}
+#lineinfositnum {
+  font-size: 1.2em;
+}
+#total span {
+  color: #ff8400;
+}
+#linebutton {
+  text-align: center;
+}
+#linebutton button {
+  width: 70%;
+  border: none;
+  background-color: #ff8400;
+  color: white;
+  font-size: 1.3em;
+  padding: 0.7em;
+  border-radius: 8px;
+  outline: none;
+}
+#buysitsuheadicon {
+  text-align: center;
+  padding: 1em 0 0.1em 0;
+}
+#buysitsuheadicon i {
+  color: #00af00;
+  font-size: 4em;
+}
+#buysitsuheadcontent {
+  padding: 0 2.7em;
+  font-size: 1.2em;
+  text-indent: 2em;
+  font-weight: bold;
+}
+#buysitsuheadbody {
+  margin: 2em;
+  padding: 1.3em;
+  padding-bottom: 0;
+  border: 2px solid #ff8400;
+  border-radius: 5px;
+}
+#buysitsuheadbody p {
+  text-align: justify;
+  color: #898989;
+  font-size: 1.1em;
+  padding-bottom: 1em;
+  line-height: 1.4em;
+}
+#first {
+  color: #ff8400 !important;
+}
+#second {
+  color: white!important;
+  font-size: 0.7em;
+  padding: 0.3em 0.5em;
+  border-radius: 2px;
+  background-color: #ff8400 !important;
+}
+#third {
+  color: #ff8400;
+}
+#fourth {
+  color: black;
+  font-size: 0.8em;
+}

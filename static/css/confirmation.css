@@ -1,0 +1,139 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
+body {
+  width: 100%;
+}
+#content {
+  width: 100%;
+}
+#head {
+  height: 2.5em;
+  font-size: 1.1em;
+  line-height: 2.5em;
+  text-align: center;
+  background-color: white;
+  color: #c0bbbb;
+}
+#subtitle {
+  color: #898989;
+  height: 2em;
+  line-height: 2em;
+  text-align: center;
+}
+#phone {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-left: 10%;
+}
+#phone input {
+  padding-left: 5%;
+  width: 51%;
+  height: 2.2em;
+  border: none;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  /* 方法2 */
+}
+#phone button {
+  background-color: #ff8400;
+  width: 30%;
+  font-size: 0.8em;
+  color: white;
+  margin-left: 2%;
+  border: none;
+  border-radius: 3px;
+  height: 3em;
+}
+#yanzhengma {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+#yanzhengma input {
+  padding-left: 1em;
+  width: 95%;
+  height: 2.2em;
+  border-radius: 4px;
+  border: none;
+}
+#confirm {
+  padding: 0 10%;
+  color: white;
+  text-align: center;
+  margin-top: 2em;
+}
+#confirm button {
+  color: white;
+  height: 2.2em;
+  border-radius: 6px;
+  font-size: 1.2em;
+  border: none;
+  width: 100%;
+  background-color: #ff8400;
+}
+#item {
+  margin-top: 1em;
+  font-size: 0.7em;
+  text-align: center;
+}
+#item span:not(#item1) {
+  color: #898989;
+}
+#item #item1 {
+  color: #ff8400;
+}
+@media screen and (min-width: 319px) and (max-width: 330px) {
+  #yanzhengma input {
+    width: 94%;
+  }
+}
+@media screen and (min-width: 760px) and (max-width: 1000px) {
+  #yanzhengma input {
+    width: 97%;
+  }
+}

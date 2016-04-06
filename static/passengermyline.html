@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no">
+    <title>天天拼车</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/myline.css">
+    <link rel="stylesheet" href="css/iconfont.css">
+</head>
+<body>
+<div id="title">
+    我的行程
+</div>
+<div id="nav">
+    <div id="passenger" class="navactive">
+        我是乘客
+    </div>
+    <div id="driver">
+        我是车主
+    </div>
+</div>
+<div id="currentline" class="ks-clear">
+    <p>2016年2月15日10:50</p>
+    <p>府谷&nbsp;—&nbsp;榆林</p>
+    <p>车牌号:<span>陕K1234L</span></p>
+    <p>车主电话:<span>12398787654</span></p>
+    <p>集合地点:<span>金信广场</span></p>
+    <div id="confirmbutton">
+        <button>确认乘坐</button>
+        <span>未乘坐?点这里</span>
+    </div>
+    <div class="currentlinelabel">当前线路</div>
+    <div id="totalprice">总价:<span>60元</span></div>
+    <div id="pingfen">
+        <p>请给车主评分</p>
+        <div>
+            <i>ic</i>
+            <i>ic</i>
+            <i>ic</i>
+            <i>ic</i>
+            <i>ic</i>
+        </div>
+
+    </div>
+</div>
+
+<div id="historyline">
+    <div class="currentlinelabel">历史行程</div>
+    <div class="historylineitem firsthistorylineitem">
+        <span class="historylineitemlocation">府谷&nbsp;-&nbsp;榆林</span>
+        <span class="historylineitemtime">2016年2月15日10:50</span>
+        <span class="historylineitemdetail">详情</span>
+    </div>
+    <div class="historylineitem">
+        <span class="historylineitemlocation">府谷&nbsp;-&nbsp;榆林</span>
+        <span class="historylineitemtime">2016年2月15日10:50</span>
+        <span class="historylineitemdetail">详情</span>
+    </div>
+    <div class="historylineitem">
+        <span class="historylineitemlocation">府谷&nbsp;-&nbsp;榆林</span>
+        <span class="historylineitemtime">2016年2月15日10:50</span>
+        <span class="historylineitemdetail">详情</span>
+    </div>
+    <div class="historylineitem ">
+        <span class="historylineitemlocation">府谷&nbsp;-&nbsp;榆林</span>
+        <span class="historylineitemtime">2016年2月15日10:50</span>
+        <span class="historylineitemdetail">详情</span>
+    </div>
+    <div class="historylineitem">
+        <span class="historylineitemlocation">府谷&nbsp;-&nbsp;榆林</span>
+        <span class="historylineitemtime">2016年2月15日10:50</span>
+        <span class="historylineitemdetail">详情</span>
+    </div>
+</div>
+<script src="js/bower_components/zepto/zepto.min.js"></script>
+<script>
+    $('#driver').on("click",function(){
+        window.location.href="drivermyline.html";
+    })
+</script>
+
+</body>
+</html>

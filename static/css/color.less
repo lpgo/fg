@@ -3,6 +3,7 @@
 @line-color:#cacaca;
 @font-color:#898989;
 @font-color-light:#c0bbbb;
+@font-color-blue:#6C94C0;
 
 body{
   background-color: @bgcolor;
@@ -19,4 +20,40 @@ body{
 
 }
 
+.ks-clear:after, .clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear, .clear {
+  *zoom: 1;
+}
 
+#title{
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: @font-color-light;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid @line-color;
+}
+.fl{
+  float: left;
+}
+.fr{
+  float: right;
+}
+@media screen and (min-width:100px) and (max-width:361px) {
+
+  body{
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width:600px) and (max-width:1300px) {
+
+  body{
+    font-size: 1.4em!important;
+  }
+}

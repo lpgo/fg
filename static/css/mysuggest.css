@@ -1,0 +1,117 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
+#suggestbutton {
+  text-align: center;
+}
+#suggestbutton button {
+  width: 70%;
+  border: none;
+  background-color: #ff8400;
+  color: white;
+  font-size: 1.3em;
+  padding: 0.7em;
+  border-radius: 8px;
+  outline: none;
+}
+#textared {
+  padding: 2em 2em;
+  text-align: center;
+}
+#textared textarea {
+  width: 90%;
+  height: 12em;
+  font-size: 1.2em;
+  padding: 1em;
+  outline: none;
+  resize: none;
+  border-radius: 4px;
+  border-color: #898989;
+}
+#mysuggesthead {
+  padding: 1em 4em;
+  text-align: center;
+  font-size: 1.4em;
+  color: black;
+}
+#congratulationbutton {
+  text-align: center;
+}
+#congratulationbutton button {
+  left: 0;
+  width: 70%;
+  border: none;
+  background-color: #ff8400;
+  color: white;
+  font-size: 1.3em;
+  padding: 0.7em;
+  border-radius: 8px;
+  outline: none;
+}
+#congratulationbuttoncontent {
+  margin-top: 4em;
+  position: relative;
+  font-size: 1.3em;
+}
+#congratulationbuttoncontent i {
+  position: absolute;
+  top: 0.6em;
+  left: 2em;
+  font-size: 1.4em;
+  color: #1e9e5e;
+}
+#congratulationbuttoncontent div {
+  position: absolute;
+  left: 50%;
+  margin-left: -4em;
+  display: inline-block;
+}
+#congratulationbuttoncontent div p {
+  margin-top: 0.3em;
+  margin-bottom: 0.5em;
+}

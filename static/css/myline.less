@@ -1,0 +1,163 @@
+@import "color";
+p{
+  margin: 0.6em 0;
+}
+body{
+  background-color: white;
+}
+#title{
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: @font-color-light;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid @line-color;
+}
+#nav{
+  padding: 1em 0;
+  position: relative;
+  font-size: 1.1em;
+  background-color: white;
+  height: 2em;
+}
+#passenger{
+  padding: 0.3em 0;
+  position: absolute;
+  display: inline-block;
+  width: 4em;
+  left: 50%;
+  margin-left: -5em;
+
+}
+.navactive{
+  color: @maincolor;
+  border-bottom: 1px solid @maincolor;
+
+
+}
+#driver{
+  padding: 0.3em 0;
+  position: absolute;
+  display: inline-block;
+  width: 4em;
+  left: 50%;
+  margin-left: 1em;
+}
+#currentline{
+  position: relative;
+  color: @font-color;
+  font-size: 1.0em;
+  margin: 0 1.3em;
+  border-radius: 0.5em;
+  border: 2px solid @line-color;
+  padding: 2em 1em 0.3em 1em;
+  button{
+    float: right;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+  p{
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+  }
+  .confirm{
+    background-color: #1e9e5e;
+
+  }
+  .noconfirm{
+    background-color: #a8a8a8;
+  }
+  .cancle{
+    background-color: #ffd46b;
+  }
+}
+
+
+#confirmbutton {
+  position: relative;
+  padding-bottom: 2em;
+  button {
+    color: white;
+    background-color: @maincolor;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    padding: 0.4em 0.8em;
+    position: absolute;
+    left: 50%;
+    top: 0.2em;
+    margin-left: -3em;
+    font-size: 0.9em;
+  }
+  span {
+    display: inline-block;
+    position: absolute;
+    right: 1em;
+    top: 0.8em;
+    color: black;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+}
+.currentlinelabel{
+  position: absolute;
+  background-color: @font-color-blue;
+  color: white;
+  padding: 0.2em 1em;
+  top: -1em;
+  left: 1em;
+  box-shadow: 4px 5px 3px rgba(0, 0, 0, 0.11);
+
+}
+#totalprice{
+  position: absolute;
+  font-size: 1.2em;
+  top: 1em;
+  right: 2em;
+  span{
+    color: @maincolor;
+  }
+}
+#pingfen{
+  position: absolute;
+  right: 2.5em;
+  top: 5em;
+  i{
+    color: gold;
+
+  }
+}
+#historyline{
+  margin-top: 2em;
+  position: relative;
+}
+.historylineitem{
+  border-bottom: 1px solid @line-color;
+  padding: 1em;
+  color: @font-color;
+}
+.historylineitemtime{
+  margin-left: 3.6em;
+}
+.historylineitemdetail{
+  color: @font-color-blue;
+  float:right;
+}
+.firsthistorylineitem{
+  border-top: 1px solid @line-color;
+}
+#locationtime{
+  float: right;
+}
+#location{
+  float: right;
+}
+#locationline{
+  margin-bottom: 1.4em;
+}
+#phonenum{
+  margin-bottom: 1.4em;
+}

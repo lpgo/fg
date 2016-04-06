@@ -1,0 +1,56 @@
+@import "color";
+body{
+  width: 100%;
+}
+#title{
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: @font-color-light;
+  background-color: white;
+  text-align: center;
+}
+#content{
+  background-color: white;
+  margin: 3em 2em;
+  border: 1px solid @maincolor;
+  border-radius: 4px;
+  span{
+    margin-left: 2em;
+    color: @font-color;
+  }
+  #carbrand{
+    padding: 0.3em 1em;
+
+    height: 3em;
+    line-height: 3em;
+    border-bottom: 1px solid @bgcolor;
+  }
+  #carnumber{
+    padding: 0.3em 1em;
+
+    height: 3em;
+    line-height: 3em;
+
+  }
+}
+#carnum{
+  margin-left: 3em !important;
+}
+#modify{
+  position: absolute;
+  left: 50%;
+  margin-left: -50px;
+  bottom: 40px;
+  text-align: center;
+  a{
+    text-decoration: none;
+    color: @font-color;
+  }
+  img{
+    display: block;
+    margin: 0 auto;
+    margin-top: 2em;
+    width: 30px;
+  }
+}
