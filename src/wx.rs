@@ -387,6 +387,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
         //login_status.openid = api_result.openid.unwrap_or(String::new());
 
         api_result.openid.and_then(|openid|{
+            login_status.openid = openid.clone();
             req.get::<PersistRead<Service>>().ok().map(|service|(service,openid))
         }).and_then(|(service,openid)|{
             let (o,p) = service.get_user_by_id(&openid);
