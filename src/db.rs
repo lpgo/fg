@@ -61,10 +61,10 @@ impl Dao {
         }		
     }
 
-    pub fn get_by_openid<T>(&self,open_id:&String) -> Result<T,()> where T:ToDoc+Deserialize{
+    pub fn get_by_openid<T>(&self,openid:&String) -> Result<T,()> where T:ToDoc+Deserialize{
         let coll = self.0.collection(T::get_name());
         let mut doc = Document::new();
-        doc.insert("open_id",open_id.clone());
+        doc.insert("openid",openid.clone());
         if let Ok(Some(user)) = coll.find_one(Some(doc),None) {
         	model::de_bson::<T>(user)
         } else {
