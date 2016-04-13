@@ -107,7 +107,7 @@ body {
   text-align: center;
   margin-top: 2em;
 }
-#confirm input {
+#confirm button {
   color: white;
   height: 2.2em;
   border-radius: 6px;

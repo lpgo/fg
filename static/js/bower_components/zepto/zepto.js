@@ -1573,4 +1573,16 @@ window.$ === undefined && (window.$ = Zepto)
   // getComputedStyle shouldn't freak out when called
   // without a valid element as argument
   try {
-    g
+    getComputedStyle(undefined)
+  } catch(e) {
+    var nativeGetComputedStyle = getComputedStyle;
+    window.getComputedStyle = function(element){
+      try {
+        return nativeGetComputedStyle(element)
+      } catch(e) {
+        return null
+      }
+    }
+  }
+})(Zepto)
+;

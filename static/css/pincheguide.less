@@ -1,0 +1,64 @@
+@import "color";
+#subtitle{
+  background-color: white;
+  padding-bottom: 0;
+  color: @font-color;
+}
+.subtitleactive{
+  color: @maincolor!important;
+  border-bottom: 1px solid @maincolor;
+}
+
+.subtitlecontent{
+  width: 4.4em;
+  margin: 0 auto;
+}
+#subtitleleft{
+  padding-top: 1em;
+  font-size: 1.1em;
+  width: 49%;
+  padding-bottom: 1em;
+  border-right: 1px solid @line-color;
+
+}
+#subtitleright{
+  padding-top: 1em;
+  padding-bottom: 1em;
+  width: 49%;
+  font-size: 1.1em;
+
+}
+#FAQ{
+  height: 3em;
+  line-height: 3em;
+  padding-left: 2em;
+  color: @font-color;
+}
+.FAQitem{
+  background-color: white;
+  border-bottom: 1px solid @line-color;
+  padding: 1em;
+  padding-left: 2em;
+  padding-right: 2em;
+  i{
+    float: right;
+    color: @font-color;
+
+  }
+  span{
+    float: left;
+  }
+}
+.clearborder{
+  border-bottom: none;
+}
+#pincheicon{
+  position: relative;
+  i{
+    position: absolute;
+    left: 50%;
+    margin-left: -1em;
+    top: 4em;
+  }
+
+}

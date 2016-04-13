@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no">
+    <title>天天拼车</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/pincheguide.css">
+    <link rel="stylesheet" href="css/iconfont.css">
+</head>
+<body>
+    <div id="title">
+        拼车指南
+    </div>
+    <div id="subtitle" class="ks-clear">
+        <div id="subtitleleft" class="fl subtitleactive">
+            <div class="subtitlecontent">
+                <i>icon</i>
+                <span>车主</span>
+            </div>
+        </div>
+        <div id="subtitleright" class="fl">
+            <div class="subtitlecontent">
+                <i>icon</i>
+                <span>乘客</span>
+            </div>
+
+        </div>
+    </div>
+    <div id="FAQ">
+        常见问题
+    </div>
+    <div id="FAQdriveritems">
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+        <div class="FAQitem ks-clear clearborder">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+    </div>
+    <div id="FAQpassengeritems" style="display: none">
+        <div class="FAQitem ks-clear">
+            <span>xxxx</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>xx</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼x座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+        <div class="FAQitem ks-clear">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+        <div class="FAQitem ks-clear clearborder">
+            <span>如何实用拼座功能</span>
+            <i>icon</i>
+        </div>
+    </div>
+
+
+    <div id="pincheicon">
+    <i >icon</i>
+</div>
+<script src="js/bower_components/zepto/zepto.min.js"></script>
+<script>
+    $(function(){
+
+        $('#subtitleleft').on('click',function(){
+            $('#FAQdriveritems').css({"display":"block"});
+            $('#FAQpassengeritems').css({"display":"none"});
+            $('#subtitleleft').addClass("subtitleactive");
+            $('#subtitleright').removeClass("subtitleactive");
+
+
+        })
+        $('#subtitleright').on('click',function(){
+            $('#FAQpassengeritems').css({"display":"block"});
+            $('#FAQdriveritems').css({"display":"none"});
+            $('#subtitleleft').removeClass("subtitleactive");
+            $('#subtitleright').addClass("subtitleactive");
+
+        })
+    })
+</script>
+
+</body>
+</html>

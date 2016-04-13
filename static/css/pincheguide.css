@@ -1,0 +1,106 @@
+body {
+  background-color: #edebeb;
+  box-sizing: border-box;
+}
+.clear {
+  zoom: 1;
+}
+.clear:after {
+  content: '';
+  clear: both;
+  display: block;
+}
+.ks-clear:after,
+.clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear,
+.clear {
+  *zoom: 1;
+}
+#title {
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: #c0bbbb;
+  background-color: white;
+  text-align: center;
+  border-bottom: 1px solid #cacaca;
+}
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+@media screen and (min-width: 100px) and (max-width: 361px) {
+  body {
+    font-size: 0.8em!important;
+  }
+}
+@media screen and (min-width: 600px) and (max-width: 1300px) {
+  body {
+    font-size: 1.4em!important;
+  }
+}
+#subtitle {
+  background-color: white;
+  padding-bottom: 0;
+  color: #898989;
+}
+.subtitleactive {
+  color: #ff8400 !important;
+  border-bottom: 1px solid #ff8400;
+}
+.subtitlecontent {
+  width: 4.4em;
+  margin: 0 auto;
+}
+#subtitleleft {
+  padding-top: 1em;
+  font-size: 1.1em;
+  width: 49%;
+  padding-bottom: 1em;
+  border-right: 1px solid #cacaca;
+}
+#subtitleright {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  width: 49%;
+  font-size: 1.1em;
+}
+#FAQ {
+  height: 3em;
+  line-height: 3em;
+  padding-left: 2em;
+  color: #898989;
+}
+.FAQitem {
+  background-color: white;
+  border-bottom: 1px solid #cacaca;
+  padding: 1em;
+  padding-left: 2em;
+  padding-right: 2em;
+}
+.FAQitem i {
+  float: right;
+  color: #898989;
+}
+.FAQitem span {
+  float: left;
+}
+.clearborder {
+  border-bottom: none;
+}
+#pincheicon {
+  position: relative;
+}
+#pincheicon i {
+  position: absolute;
+  left: 50%;
+  margin-left: -1em;
+  top: 4em;
+}

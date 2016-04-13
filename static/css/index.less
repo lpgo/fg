@@ -1,0 +1,262 @@
+@import "color";
+#indexnav{
+  position: fixed;
+  top:0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+#title{
+  height: 2.5em;
+  line-height: 2.5em;
+  font-size: 1.1em;
+  color: @font-color-light;
+  background-color: white;
+  text-align: center;
+  position: relative;
+  border: none;
+}
+#indexmessage{
+  position: absolute;
+  width:1.5em;
+  left: 4.0em;
+  top: 50%;
+  margin-top: -0.7em;
+}
+#indexpeopleinfo{
+  position: absolute;
+  width:1.5em;
+  left: 1.3em;
+  top: 50%;
+  margin-top: -0.7em;
+
+}
+#indexarrowup{
+  position: absolute;
+  width:1.0em;
+  height: 0.6em;
+  right: 1.3em;
+  top: 50%;
+  margin-top: -0.25em;
+
+}
+#indexlocation{
+  position: absolute;
+  position: absolute;
+  width:1.7em;
+  right: 2.4em;
+  font-size: 0.9em;
+  top: 50%;
+  margin-top: -1.2em;
+  width: 4em;
+}
+#subtitle{
+  background-color: white;
+  padding: 1.4em;
+  padding-bottom: 0.6em;
+}
+#subtitleleft{
+  padding-left: 35%;
+  float: left;
+  color: @maincolor;
+  div{
+    padding-bottom: 0.5em;
+
+    border-bottom: 1px solid @maincolor;
+  }
+}
+#subtitleright{
+  float: left;
+  color: @font-color;
+  margin-left: 2em;
+  div{
+    padding-bottom: 0.5em;
+  }
+
+}
+
+
+#content{
+  margin-top: 6em;
+  padding-top: 2em;
+  background-color: white;
+}
+#content #search{
+  padding-left: 26px;
+  padding-right: 26px;
+  text-align: center;
+}
+#content #search .searchlocation{
+  margin: 0 auto;
+  width: 80%;
+  position: relative;
+}
+#content #search .searchlocation #searchbegin,#searchend{
+  width: 30%;
+  border: none;
+  border-bottom: 1px solid #cfcccc;
+}
+#content #search .searchlocation img{
+  width: 10%;
+}
+#searchbegin{
+
+  margin-right: 15px;
+  float: left;
+}
+#searchend{
+  float: right;
+  margin-left: 15px;
+  text-align: right;
+}
+#content #search #searchtime{
+  width: 100%;
+  float: left;
+  border: none;
+  border-bottom: 1px solid #cfcccc;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+#content #search input{
+  outline: none;
+}
+#content #search #submit{
+  width: 70%;
+  height: 1.8em;
+  border: none;
+  background-color:#ff8400 ;
+  color: white;
+  font-weight: bold;
+  border-radius: 12px;
+  font-size: 1.4em;
+}
+#hotline{
+  margin-top: 2em;
+  padding-left: 1.2em;
+  padding-right: 1.2em;
+  padding-bottom: 2em;
+
+}
+#hotlinetitle{
+  font-size: 1.2em;
+  font-weight: bold;
+}
+#hotline>div{
+  font-size: 0.9em;
+  margin-top: 1em;
+  color: @font-color;
+  span{
+    margin-right: 1em;
+    color: @font-color;
+  }
+}
+
+
+#content #newpost{
+  padding-left: 1em;
+  padding-right: 1em;
+  background-color:#f6f5f5 ;
+  padding-bottom: 2em;
+  position: relative;
+
+}
+#content #newpost .newposttitle{
+  color: white;
+  font-weight: bold;
+  background-color: #6c94c0;
+  width: 120px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 4px;
+  -webkit-box-shadow:  -2px -2px 3px rgba(170, 170, 170, 0.26);
+  -moz-box-shadow:  -2px -2px 3px rgba(170, 170, 170, 0.26);
+  box-shadow:  -2px -2px 3px rgba(170, 170, 170, 0.26);
+}
+#content #newpost .newpostitem{
+  position: relative;
+  color:#8a9799;
+  overflow: hidden;
+  width: 100%;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 6px;
+  margin: 8px 0;
+  height: 80px;
+  line-height: 80px;
+  -webkit-box-shadow:  -2px -2px 3px rgba(170, 170, 170, 0.26);
+  -moz-box-shadow: -2px -2px 3px rgba(170, 170, 170, 0.26);
+  box-shadow: -2px -2px 3px rgba(170, 170, 170, 0.26);
+}
+#content #newpost .newpostitem:after{
+  content: '';
+  display: block;
+  clear: both;
+}
+#content #newpost .newpostitem .newpostcaricon{
+  float: left;
+  display: inline-block;
+  margin-left: 2%;
+  position: absolute;
+  left: 1.4em;
+  top: 50%;
+  margin-top: -1em;
+  width: 2em;
+}
+#content #newpost .newpostitem .newpostlinetime{
+  display: inline-block;
+  line-height: 30px;
+  margin-top: 10px;
+  margin-left: 20%;
+
+  float: left;
+}
+#content #newpost .newpostitem .newpostprice{
+  display: inline-block;
+  float: left;
+  margin-left: 1%;
+}
+#content #newpost .newpostitem .newpostseat{
+  display: inline-block;
+  margin-left: 1%;
+  font-weight: bold;
+  float: left;
+}
+#content #newpost .newpostitem .newposticon{
+  width: 1.8em;
+  right: 3%;
+  right: 1.6em;
+  top: 50%;
+  position: absolute;
+  margin-top: -1.5em;
+
+
+}
+
+
+@media screen and (min-width:600px) and (max-width:1300px) {
+  #subtitleleft{
+    padding-left: 39%!important;
+  }
+
+}
+@media screen and (min-width:100px) and (max-width:361px) {
+
+  #subtitleleft{
+    padding-left: 34%!important;
+  }
+}
+
+
+@media screen and (min-width:362px) and (max-width:380px) {
+
+  #hotline>div{
+    font-size: 0.8em!important;
+    margin-top: 1em;
+    span{
+      margin-right: 1em;
+    }
+  }
+}
+
+

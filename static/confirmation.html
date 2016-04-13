@@ -15,18 +15,16 @@
     <div id="head">验证手机</div>
     <div id="content">
         <div id="subtitle">为方便于车主联系,请验证手机</div>
-        <form action="/registerPassenger" method="post">
-            <div id="phone">
-                <input  type="number" maxlength="13" placeholder="手机号" name="tel">
-                <button type="button">获取验证码</button>
-            </div>
-            <div id="yanzhengma">
-                <input type="text" placeholder="验证码" name="code">
-            </div>
-            <div id="confirm">
-                <input type="submit" value="确定">
-            </div>
-        </form>
+        <div id="phone">
+            <input  type="number" maxlength="13" placeholder="手机号">
+            <button type="button">获取验证码</button>
+        </div>
+        <div id="yanzhengma">
+            <input type="text" placeholder="验证码">
+        </div>
+        <div id="confirm">
+            <button type="button">确定</button>
+        </div>
         <div id="item">
             <span>点击-确定,既表示您同意</span>
             <span id="item1"><<法律声明及隐私策略>></span>
