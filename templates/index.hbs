@@ -8,17 +8,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no">
     <title>天天拼车</title>
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/iconfont.css">
-    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/css/iconfont.css">
+    <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
 <div id="indexnav">
     <div id="title">
         天天拼车
-        <img id="indexmessage" src="img/message.png">
-        <img id="indexpeopleinfo" src="img/peopleinfo.png">
-        <img id="indexarrowup" src="img/arrowup.png">
+        <img id="indexmessage" src="/static/img/message.png">
+        <img id="indexpeopleinfo" src="/static/img/peopleinfo.png">
+        <img id="indexarrowup" src="/static/img/arrowup.png">
         <span id="indexlocation">府谷</span>
     </div>
     <div id="subtitle" class="ks-clear">
@@ -42,7 +42,7 @@
     <form id="search" action="" method="get">
         <div class="searchlocation">
             <input  id="searchbegin" type="text" placeholder="起点"/>
-            <img src="img/searcharrow.png" alt=""/>
+            <img src="/static/img/searcharrow.png" alt=""/>
             <input id="searchend" type="text" placeholder="终点"/>
             <input id="searchtime" type="text" placeholder="时间"/>
         </div>
@@ -68,7 +68,7 @@
         <div class="newposttitle">最新发布</div>
         {{#each .}}
         <div class="newpostitem">
-            <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
+            <img class="newpostcaricon" src="/static/img/peopleinfo.png" alt=""/>
             <div class="newpostlinetime">
                 <div class="newpostline">
                     <span>{{start}}</span>
@@ -85,7 +85,7 @@
             <div class="newpostseat">
                 <span>余{{current_seat}}座</span>
             </div>
-            <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
+            <a class="newposticon" href=""><img src="/static/img/peopleinfo.png" alt=""/></a>
         </div>
         {{/each}}
     </div>
