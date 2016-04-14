@@ -23,16 +23,20 @@ pub struct Seat {
     submit : bool
 }
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Serialize, Deserialize,Default)]
 pub struct Trip {
     _id:Option<Bson>,
-    owner_id: String,
-    seat_count : u32,
-    current_seat : u32,
-    start_time : i64,
-    line:u32,
-    status:String,
-    message:Option<String>
+    pub owner_id: String,
+    pub seat_count : u32,
+    pub current_seat : u32,
+    pub start_time : i64,
+    pub line:u32,
+    pub start:String,
+    pub end:String,
+    pub price:f32,
+    pub venue:String,
+    pub status:String,
+    pub message:Option<String>
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -44,11 +48,11 @@ pub enum TripStatus {
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
 pub struct Line {
      _id:Option<Bson>,
-     id:u32,
-     start:String,
-     end:String,
-     price:f32,
-     hot : bool
+     pub id:u32,
+     pub start:String,
+     pub end:String,
+     pub price:f32,
+     pub hot : bool
 }
 
 //统一下单返回结果
@@ -145,49 +149,6 @@ impl Seat {
     }
 }
 
-impl Trip {
-    pub fn new(oid:String, line_id:u32, start:chrono::DateTime<chrono::Local>, seat_count:u32) -> Trip {
-        Trip {_id:None,owner_id: oid,seat_count : seat_count,current_seat : seat_count, start_time : start.timestamp(),line:line_id,status:"Prepare".to_string(),message:None}
-    }
-}
-
-pub fn de_xml<T>(data:&str) -> Result<T,Error> where T:Deserialize{
-  from_str(data)
-}
-
-pub fn en_bson<T>(data:T) -> Result<Document,()> where T:Serialize{
-    let mut e = Encoder::new();
-    if let Ok(_) = data.serialize(&mut e) {
-        match e.bson() {
-            Ok(b) => {
-                if let Bson::Document(d) = b {
-                    Ok(d)
-                } else {
-                    Err(())
-                }
-            }
-            Err(e) => {
-                warn!("error is {:?}", e);
-                Err(())
-            }
-        }
-    } else {
-        Err(())
-    }
-    
-}
-
-pub fn de_bson<T>(data:Document) -> Result<T,()> where T:Deserialize {
-    let mut d = Decoder::new(Bson::Document(data));
-    match Deserialize::deserialize(&mut d) {
-        Ok(t) => Ok(t),
-        Err(e) => {
-            warn!("error is {}",e);
-            Err(())
-        }
-    } 
-}
-
 #[derive(Serialize, Debug)]
     pub struct Team {
         name: String,
@@ -212,3 +173,5 @@ pub fn de_bson<T>(data:Document) -> Result<T,()> where T:Deserialize {
         data.insert("engine".to_string(), value::to_value(&"serde_json"));
         data
     }
+
+    

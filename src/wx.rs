@@ -7,6 +7,7 @@ use persist::State as PersistState;
 use urlencoded::{UrlEncodedBody,UrlEncodedQuery};
 use iron::{status,Url};
 use iron::modifiers::Redirect;
+use iron::error::HttpError;
 use db::Dao;
 use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo};
 use service::{Service,ServiceError};
@@ -193,9 +194,17 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
 
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
-        let data = model::make_data();
-        res_template!("index",data,resp)
-   
+        redirect!("/static/postline.html")
+}
+
+pub fn can_publish_trip(req:&mut Request) -> IronResult<Response> {
+    get_session::<LoginStatus>(req).ok_or(IronError::new(HttpError::Method,"can not get session")).and_then(|ls|{
+        match ls.user_type {
+            UserType::Owner => redirect!("/static/postline.html"),
+            UserType::Passenger => redirect!("/static/driverregister.html"),
+            UserType::Anonymous => redirect!("/static/confirmation.html"),
+        }
+    })
 }
 
 pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
@@ -224,9 +233,25 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                 if let Ok(seat) = seat_count.parse::<u32>() {
                     if let Ok(start) = Local.datetime_from_str(start_time, "%Y-%m-%d %H:%M:%S") {
                         //start.with_timezone(&UTC);
-                        let t = Trip::new(login_status.openid.clone(),id,start,seat);
-                        service.add_trip(t);
-                        return Ok(Response::with((status::Ok,"publish Trip sucess!")));
+                        let mut  t = Trip::default();
+                        let line = service.get_line_by_id(id);
+                        match line {
+                            Ok(line) => {
+                                t.owner_id = login_status.openid.clone();
+                                t.line = id;
+                                t.start = line.start;
+                                t.end = line.end;
+                                t.price = line.price;
+                                t.start_time = start.timestamp();
+                                t.seat_count = seat;
+                                service.add_trip(t);
+                                return Ok(Response::with((status::Ok,"publish Trip sucess!")));
+                            },
+                            Err(err) => {
+                                warn!("get line has a err :{}",err);
+                                return Ok(Response::with((status::Ok,"err line id")));
+                            }
+                        }
                     }
                 }
             }
@@ -263,9 +288,7 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         set_session::<LoginStatus>(req, &mut resp, login_status);
         let data = model::make_data();
         if to_owner {
-            let domain = ConfigManager::get_config_str("app", "domain");
-            let urlstr = domain+"/static/driverregister.html";
-            redirect!(&urlstr)
+            redirect!("/static/driverregister.html")
         } else {
             res_template!("index",data,resp)
         }
@@ -274,13 +297,13 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     }
     
 }
-
+/*
 pub fn get_trips(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     Ok(Response::with((status::Ok,service.get_new_trips())))
 }
 
-/*
+
 pub fn login(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut openid = String::new();
@@ -374,19 +397,14 @@ pub fn test(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn ico(req: &mut Request) -> IronResult<Response> {
-    let domain = ConfigManager::get_config_str("app", "domain");
-    let urlstr = domain+"/static/favicon.ico";
-    redirect!(&urlstr)
+    redirect!("/static/favicon.ico")
 }
 
 pub fn index(req: &mut Request) -> IronResult<Response> {
-    let domain = ConfigManager::get_config_str("app", "domain");
-    let urlstr = domain+"/static/index.html";
-    redirect!(&urlstr)
+    redirect!("/static/index.html")
 }
 
 pub fn index_template(req: &mut Request) -> IronResult<Response> {
-    let mut data = model::make_data();
     let mut resp = Response::new();
     req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
         &hashmap.get("code").unwrap()[0]
@@ -406,12 +424,10 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
             p.map(|passenger|{
                 login_status.user_type = UserType::Passenger;
                 login_status.passenger = Some(passenger);
-                data.insert("userType".to_string(), serde_json::value::to_value(&"Passenger"))
             });
             o.map(|owner|{
                 login_status.user_type = UserType::Owner;
                 login_status.owner = Some(owner);
-                data.insert("userType".to_string(), serde_json::value::to_value(&"Owner"))
             });
             Some(())
         });
@@ -419,7 +435,16 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
         set_session::<LoginStatus>(req, &mut resp, login_status);
         Ok(())
     });
-    res_template!("index",data,resp)
+    match req.get::<PersistRead<Service>>().map(|service|{
+        service.get_new_trips()
+    }) {
+        Ok(data) => res_template!("index",data,resp),
+        Err(err) => {
+            warn!("get serivce err :{}",err);
+            let data:Vec<model::Trip> = Vec::new();
+            res_template!("index",data,resp)
+        } 
+    }
 }
 
 pub fn get_web_token(code:&str) -> Result<ApiResult> {

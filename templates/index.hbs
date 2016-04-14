@@ -1,3 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no">
+    <title>天天拼车</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/iconfont.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div id="indexnav">
+    <div id="title">
+        天天拼车
+        <img id="indexmessage" src="img/message.png">
+        <img id="indexpeopleinfo" src="img/peopleinfo.png">
+        <img id="indexarrowup" src="img/arrowup.png">
+        <span id="indexlocation">府谷</span>
+    </div>
+    <div id="subtitle" class="ks-clear">
+        <div id="subtitleleft">
+            <div>
+                <i>I</i>
+                <span>乘客</span>
+            </div>
+
+        </div>
+        <div id="subtitleright">
+            <div>
+                <i>I</i>
+                <span><a href="/can_publish_trip">车主</a></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="content">
+    <form id="search" action="" method="get">
+        <div class="searchlocation">
+            <input  id="searchbegin" type="text" placeholder="起点"/>
+            <img src="img/searcharrow.png" alt=""/>
+            <input id="searchend" type="text" placeholder="终点"/>
+            <input id="searchtime" type="text" placeholder="时间"/>
+        </div>
+
+        <input  id="submit" type="submit" value="查&nbsp&nbsp&nbsp询"></input>
+
+    </form>
+    <div id="hotline">
+        <div id="hotlinetitle">热门线路</div>
+        <div id="hotlinsec1">
+            <span>府谷<i>icon</i>大柳塔</span>
+            <span>府谷<i>icon</i>大柳塔</span>
+            <span>府谷<i>icon</i>大柳塔</span>
+        </div>
+        <div id="hotlinsec2">
+            <span>府谷<i>icon</i>大柳塔</span>
+            <span>府谷<i>icon</i>大柳塔</span>
+            <span>府谷<i>icon</i>大柳塔</span>
+
+        </div>
+    </div>
+    <div id="newpost">
+        <div class="newposttitle">最新发布</div>
+        {{#each}}
+        <div class="newpostitem">
+            <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
+            <div class="newpostlinetime">
+                <div class="newpostline">
+                    <span>{{start}}</span>
+                    <span>&nbsp;-&nbsp;</span>
+                    <span>{{end}}</span>
+                </div>
+                <div class="newposttime">
+                    <span>{{start_time}}</span>
+                </div>
+            </div>
+            <div class="newpostprice">
+                <span>{{price}}元|人</span>
+            </div>
+            <div class="newpostseat">
+                <span>余{{current_seat}}座</span>
+            </div>
+            <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
+        </div>
+        {{/each}}
+    </div>
+
+</div>
+
+</body>
+</html>
+
+
+
+
+
+<!--
 <html>
   <head>
     <title>中超联赛 {{year}}</title>
@@ -23,3 +125,4 @@
 
   </body>
 </html>
+-->

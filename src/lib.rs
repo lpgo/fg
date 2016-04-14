@@ -34,8 +34,10 @@ macro_rules! res_template {
 
 macro_rules! redirect {
     ($url:expr) => ({
+    	let domain = ConfigManager::get_config_str("app", "domain");
+           	let urlstr = domain+$url;
 	let mut response = Response::new();
-	let url = Url::parse($url).unwrap();
+	let url = Url::parse(&urlstr).unwrap();
 	response.set_mut(status::Found).set_mut(Redirect(url));
 	Ok(response)
     })  

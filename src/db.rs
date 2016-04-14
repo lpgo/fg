@@ -5,11 +5,14 @@ use mongodb::ThreadedClient;
 use mongodb::db::{ThreadedDatabase,DatabaseInner};
 use iron::typemap::Key;
 use model;
+use service;
 use serde::{Deserialize, Serialize, Deserializer};
 use rustc_serialize::json;
 use chrono::offset::local::Local;
 use config::ConfigManager;
+use std::result;
 
+pub type Result<T> = result::Result<T, service::ServiceError>;
 
 pub trait ToDoc {
 	fn get_name() -> &'static str;
@@ -53,35 +56,32 @@ impl Dao {
         Dao(get_db())
     }
 
-    pub fn add<T>(&self,t:T) -> Result<(),String> where T:ToDoc+Serialize{
+    pub fn add<T>(&self,t:T) -> Result<()> where T:ToDoc+Serialize{
         let coll = self.0.collection(T::get_name());
-        match coll.insert_one(model::en_bson(t).unwrap(),None) {
-        	Ok(_) => Ok(()),
-        	Err(_) => Err(format!("insert one {} error!",T::get_name()))
-        }		
+       coll.insert_one(service::en_bson(t).unwrap(),None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err)) 
     }
 
-    pub fn get_by_openid<T>(&self,openid:&String) -> Result<T,()> where T:ToDoc+Deserialize{
+    pub fn get_by_openid<T>(&self,openid:&String) -> Result<T> where T:ToDoc+Deserialize{
         let coll = self.0.collection(T::get_name());
         let mut doc = Document::new();
         doc.insert("openid",openid.clone());
-        if let Ok(Some(user)) = coll.find_one(Some(doc),None) {
-        	model::de_bson::<T>(user)
-        } else {
-        	Err(())
-        }	
+        coll.find_one(Some(doc),None).map_err(|err|service::ServiceError::MongodbError(err)).and_then(|op|{
+            op.ok_or(service::ServiceError::Other("not find by this openid".to_string())).and_then(|doc|{
+                service::de_bson::<T>(doc)
+            })
+        })
     }
 
-    pub fn get_by_id<T>(&self,id:Bson) -> Result<T,()>  where T:ToDoc+Deserialize {
+    pub fn get_by_id<T>(&self,id:Bson) -> Result<T>  where T:ToDoc+Deserialize {
         let coll = self.0.collection(T::get_name());
         let mut doc = Document::new();
         //let Bson::ObjectId(_id) = id;
         doc.insert("_id",id);
-        if let Ok(Some(user)) = coll.find_one(Some(doc),None) {
-            model::de_bson::<T>(user)
-        } else {
-            Err(())
-        }   
+         coll.find_one(Some(doc),None).map_err(|err|service::ServiceError::MongodbError(err)).and_then(|op|{
+            op.ok_or(service::ServiceError::Other("not find by this _id".to_string())).and_then(|doc|{
+                service::de_bson::<T>(doc)
+            })
+        })
     }
 
     
@@ -94,7 +94,7 @@ impl Dao {
         if let Ok(c) = coll.find(Some(doc),None) {
             for result in c {
                 let value = result.unwrap();
-                data.push(model::de_bson::<model::Trip>(value).unwrap());
+                data.push(service::de_bson::<model::Trip>(value).unwrap());
             }
         } 
         data
@@ -105,9 +105,21 @@ impl Dao {
         coll.find(None,None).map(|cursor|{
             cursor.map(|result| {
                 let value = result.unwrap();
-                model::de_bson::<model::Line>(value).unwrap()
+                service::de_bson::<model::Line>(value).unwrap()
             }).collect()
         }).unwrap()
+    }
+
+    pub fn get_line_by_id(&self,id:u32) -> Result<model::Line> {
+        let coll = self.0.collection(model::Line::get_name());
+        let mut doc = Document::new();
+        //let Bson::ObjectId(_id) = id;
+        doc.insert("id",id);
+        coll.find_one(Some(doc),None).map_err(|err|service::ServiceError::MongodbError(err)).and_then(|od|{
+            od.ok_or(service::ServiceError::Other("not find by this id".to_string())).and_then(|doc|{
+                service::de_bson::<model::Line>(doc)
+            })
+        })
     }
 
     pub fn get_hot_lines(&self) -> Vec<model::Line> {
@@ -117,13 +129,13 @@ impl Dao {
         coll.find(Some(doc),None).map(|cursor|{
             cursor.map(|result| {
                 let value = result.unwrap();
-                model::de_bson::<model::Line>(value).unwrap()
+                service::de_bson::<model::Line>(value).unwrap()
             }).collect()
         }).unwrap()
     }
    
     //db.Trip.update({"owner_id":"openid"},{"$set":{"status":"Finish"}})
-    pub fn update_status(&self) -> Result<(),()> {
+    pub fn update_status(&self) -> Result<()> {
         let coll = self.0.collection("Trip");
         let now = Local::now().timestamp();
         warn!("now is {}",now);
@@ -131,10 +143,7 @@ impl Dao {
         let mut update_doc = Document::new();
         update_doc.insert("$set",doc!{"status" => "Running"});
         doc.insert("start_time",doc!{"$lte" => now});
-        if let Ok(_) = coll.update_many(doc,update_doc,None) {
-            return Ok(());
-        }
-        return Err(());
+       coll.update_many(doc,update_doc,None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err))
     }
     
 }
