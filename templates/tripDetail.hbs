@@ -33,14 +33,14 @@
            ); 
         }
 
-        function applyTrip () {
+        function applyTrip() {
             $.ajax({
               url: "/applyTrip",
               data: {oid:"{{_id.$oid}}"},
               dataType: "json",
               type:"post",
               success: function(data){
-                alert(s.success);
+                alert(data.success);
                 pay(data);
             }
             });
