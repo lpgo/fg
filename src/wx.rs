@@ -9,7 +9,7 @@ use iron::{status,Url};
 use iron::modifiers::Redirect;
 use iron::error::HttpError;
 use db::Dao;
-use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo};
+use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo,TripStatus};
 use service::{Service,ServiceError};
 use mongodb::db::ThreadedDatabase;
 use session::{Session,SessionContext};
@@ -251,6 +251,8 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.price = line.price;
                                 t.start_time = start.timestamp();
                                 t.seat_count = seat;
+                                t.current_seat = seat;
+                                t.status = TripStatus::Prepare.to_string();
                                 t.venue = venue.clone();
                                 service.add_trip(t);
                                 return Ok(Response::with((status::Ok,"publish Trip sucess!")));

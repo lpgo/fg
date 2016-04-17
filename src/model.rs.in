@@ -149,6 +149,16 @@ impl Seat {
     }
 }
 
+impl TripStatus {
+    pub fn to_string(&self) -> String {
+        match *self {
+            TripStatus::Prepare => "Prepare".to_string(),
+            TripStatus::Running => "Running".to_string(),
+            TripStatus::Finish => "Finish".to_string()
+        }
+    }
+}
+
 #[derive(Serialize, Debug)]
     pub struct Team {
         name: String,
