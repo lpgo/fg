@@ -56,6 +56,8 @@ fn main() {
     router.post("/applyTrip",wx::apply_trip);
     router.post("/getLines", wx::get_lines);
     router.post("/getHotLines",wx::get_hot_lines);
+    router.post("/payResult",wx::pay_result);
+    router.get("/payResult",wx::pay_result);
 
     //template
     router.get("/pinche/index.html",wx::index_template);

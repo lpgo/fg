@@ -291,6 +291,20 @@ pub fn trip_detail_template(req:&mut Request) -> IronResult<Response> {
     }
 }
 
+pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
+    let mut buf = String::new();
+    match req.body.read_to_string(& mut buf) {
+        Ok(_) => {
+            warn!("pay_result is {}",buf);
+            Ok(Response::with(status::Ok))
+        },
+        Err(err) => {
+            warn!("pay_result error is {}",err);
+            Ok(Response::with(status::Ok))
+        }
+    }
+}
+
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
