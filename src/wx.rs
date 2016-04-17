@@ -450,6 +450,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
     }) {
         Ok(data) => {
             warn!("data is ---  {:?}",data);
+            warn!("data json is {}",serde_json::to_string(&data).unwrap());
             res_template!("index",data,resp)
         },
         Err(err) => {
