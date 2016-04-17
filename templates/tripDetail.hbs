@@ -13,7 +13,6 @@
     <script type="text/javascript" src="/static/js/bower_components/zepto/zepto.min.js"></script>
     <script type="text/javascript">
         function pay(data) {
-            alert(data);
             WeixinJSBridge.invoke(
                'getBrandWCPayRequest', 
                data,
@@ -21,7 +20,7 @@
                    if(res.err_msg == "get_brand_wcpay_request：ok" ) {
                         alert("ok");
                    } else {
-                        alert("false");
+                        alert(res.err_msg);
                    }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                }
            ); 
@@ -33,7 +32,14 @@
               data: {oid:"{{_id.$oid}}"},
               dataType: "json",
               method:"post",
-              success: function(data){pay(data);}
+              success: function(data){
+                var s;
+                $.each(data,function(n,value) {
+                   s += n + "-"+value+"\n";
+                });
+                alert(s);
+                pay(data);
+            }
             });
         }
          
