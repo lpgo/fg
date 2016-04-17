@@ -34,7 +34,7 @@ pub struct Trip {
     pub line_id:u32,
     pub start:String,
     pub end:String,
-    pub price:f32,
+    pub price:String,
     pub venue:String,
     pub status:String,
     pub message:Option<String>
