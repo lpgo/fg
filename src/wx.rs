@@ -275,7 +275,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
 
 pub fn trip_detail_template(req:&mut Request) -> IronResult<Response> {
     match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
-        req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
+        req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
             let oid = &hashmap.get("oid").unwrap()[0];
             service.get_trip_by_oid(oid)
         })
