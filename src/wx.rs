@@ -195,7 +195,7 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
         let mut resp = Response::new();
         let ls = login_status.clone();
         set_session::<LoginStatus>(req, &mut resp, login_status);
-        res_template!("publisthTrip",ls.owner.unwrap(),resp)
+        res_template!("publishTrip",ls.owner.unwrap(),resp)
 }
 
 pub fn can_publish_trip(req:&mut Request) -> IronResult<Response> {
@@ -203,7 +203,7 @@ pub fn can_publish_trip(req:&mut Request) -> IronResult<Response> {
         match ls.user_type {
             UserType::Owner => {
                 let mut resp = Response::new();
-                res_template!("publisthTrip",ls.owner.unwrap(),resp)
+                res_template!("publishTrip",ls.owner.unwrap(),resp)
             },
             UserType::Passenger => redirect!("/static/driverregister.html"),
             UserType::Anonymous => redirect!("/static/confirmation.html"),
