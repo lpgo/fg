@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no">
+    <title>天天拼车</title>
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/css/postline.css">
+    <link rel="stylesheet" href="/static/css/iconfont.css">
+
+</head>
+<body>
+<div id="header">
+    <div class=" title">
+        发布行程
+    </div>
+    <div class="item subtitle">
+        <div class="subtitletext">
+            <div>
+                每一次遇见,
+            </div>
+            <div>
+                都能发现不一样的人生
+            </div>
+        </div>
+
+    </div>
+    <form action="/publishTrip" method="post">
+        <div class="item">
+            <i class="icon iconfont" id="starticon">&#xe64a;</i>
+            <input type="text" placeholder="起点">
+        </div>
+        <div class="item">
+            <i class="icon iconfont " id="endicon">&#xe64a;</i>
+            <input type="text" placeholder="终点">
+        </div>
+        <div class="item">
+            <i class="icon iconfont" >&#xe706;</i>
+            <input style="width: 83%" type="datetime-local" placeholder="时间" name="startTime" >
+        </div>
+        <div class="item">
+            <i class="icon iconfont">&#xe614;</i>
+            <input type="text" placeholder="剩余座位" name="seatCount">
+        </div>
+        <div class="item">
+            <i class="icon iconfont">&#xe650;</i>
+            <input type="text" placeholder="集合地点" name="venue">
+        </div>
+    </div>
+    <div id="footer">
+        <div class="item clear">
+            <i class="icon iconfont leftimtetext">&#xe63d;</i>
+            <div class="leftimtetext">
+                <span >车辆号牌</span>
+            </div>
+            <div class="rightitemtext">
+                <span id="chepai">{{plate_number}}</span>
+                <a  href="">&nbsp修改</a>
+            </div>
+
+        </div>
+        <div class="item clear" id="item2">
+            <i class="icon iconfont leftimtetext">&#xe64e;</i>
+            <span  class="leftimtetext">单座价格</span>
+            <span class="rightitemtext">40元</span>
+        </div>
+    </div>
+    <input name="lineId" type="hidden" value="1">
+    <div id="button">
+        <input type="submit">确认发布</button>
+    </div>
+</form>
+<br>
+<br>
+
+
+</body>
+</html>

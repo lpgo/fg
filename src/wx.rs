@@ -193,14 +193,18 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
         });
 
         let mut resp = Response::new();
+        let ls = login_status.clone();
         set_session::<LoginStatus>(req, &mut resp, login_status);
-        redirect!("/static/postline.html")
+        res_template!("publisthTrip",ls.owner.unwrap(),resp)
 }
 
 pub fn can_publish_trip(req:&mut Request) -> IronResult<Response> {
     get_session::<LoginStatus>(req).ok_or(IronError::new(HttpError::Method,"can not get session")).and_then(|ls|{
         match ls.user_type {
-            UserType::Owner => redirect!("/static/postline.html"),
+            UserType::Owner => {
+                let mut resp = Response::new();
+                res_template!("publisthTrip",ls.owner.unwrap(),resp)
+            },
             UserType::Passenger => redirect!("/static/driverregister.html"),
             UserType::Anonymous => redirect!("/static/confirmation.html"),
         }
@@ -225,9 +229,12 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
-            let line_id = &hashmap.get("line_id").unwrap()[0];
-            let start_time = &hashmap.get("start").unwrap()[0];
-            let seat_count = &hashmap.get("seat_count").unwrap()[0];
+            let line_id = &hashmap.get("lineId").unwrap()[0];
+            let start_time = &hashmap.get("startTime").unwrap()[0];
+            let seat_count = &hashmap.get("seatCount").unwrap()[0];
+            let venue = &hashmap.get("venue").unwrap()[0];
+
+            warn!("time type is  {}",start_time);
 
             if let Ok(id) = line_id.parse::<u32>() {
                 if let Ok(seat) = seat_count.parse::<u32>() {
@@ -238,12 +245,13 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                         match line {
                             Ok(line) => {
                                 t.owner_id = login_status.openid.clone();
-                                t.line = id;
+                                t.line_id = id;
                                 t.start = line.start;
                                 t.end = line.end;
                                 t.price = line.price;
                                 t.start_time = start.timestamp();
                                 t.seat_count = seat;
+                                t.venue = venue.clone();
                                 service.add_trip(t);
                                 return Ok(Response::with((status::Ok,"publish Trip sucess!")));
                             },
