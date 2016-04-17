@@ -13,6 +13,7 @@
     <script type="text/javascript" src="/static/js/bower_components/zepto/zepto.min.js"></script>
     <script type="text/javascript">
         function pay(data) {
+            alert(data);
             WeixinJSBridge.invoke(
                'getBrandWCPayRequest', 
                data,
@@ -27,8 +28,12 @@
         }
 
         function applyTrip () {
-            $.post("/applyTrip",{oid:"{{_id.$oid}}"},function(data,status){
-                pay(data);
+            $.ajax({
+              url: "/applyTrip",
+              data: {oid:"{{_id.$oid}}"},
+              dataType: "json",
+              method:"post",
+              success: function(data){pay(data);}
             });
         }
          
