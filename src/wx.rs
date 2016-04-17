@@ -448,7 +448,10 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
     match req.get::<PersistRead<Service>>().map(|service|{
         service.get_new_trips()
     }) {
-        Ok(data) => res_template!("index",data,resp),
+        Ok(data) => {
+            warn!("data is ---  {:?}",data);
+            res_template!("index",data,resp)
+        },
         Err(err) => {
             warn!("get serivce err :{}",err);
             let data:Vec<model::Trip> = Vec::new();
