@@ -395,6 +395,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
     match replay {
         Ok(rep) => {
             let r = json::encode(&rep.unwrap()).unwrap();
+            warn!("apply_trip() result : {}",r);
             Ok(Response::with((status::Ok,format!("{}",r))))
         },
         Err(err) => {
