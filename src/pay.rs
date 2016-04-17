@@ -70,6 +70,7 @@ impl PrePay {
 	}
 
     fn to_xml(&self) -> String {
+    	let api_key = ConfigManager::get_config_str("app", "apikey");
     	let fee = format!("{}",self.total_fee);
     	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
 	strs.insert("appid",&self.appid);
@@ -89,7 +90,8 @@ impl PrePay {
 		ss.push_str(v);
 		ss.push('&');
 	}
-	ss.pop();
+	ss.push_str("key=");
+	ss.push_str(&api_key);
 	warn!("ss is {}",&ss);
 	let sign = to_md5(&ss);
 
