@@ -90,6 +90,7 @@ impl PrePay {
 		ss.push('&');
 	}
 	ss.pop();
+	warn!("ss is {}",&ss);
 	let sign = to_md5(&ss);
 
     	format!(r#"
@@ -133,10 +134,12 @@ pub fn ssl_client() -> Client {
 pub fn pre_pay(p : PrePay) -> Result<PrePayResult,&'static str> {
 	//let client = Client::new();
 	let client = ssl_client();
-	if let Ok(ref mut res) = client.post("https://api.mch.weixin.qq.com/pay/unifiedorder").body(&p.to_xml()).send() {
+	let xml = p.to_xml();
+	warn!("send ** {}",&xml);
+	if let Ok(ref mut res) = client.post("https://api.mch.weixin.qq.com/pay/unifiedorder").body(&xml).send() {
 		let mut buf = String::new();
 		if let Ok(_) = res.read_to_string(& mut buf) {
-			println!("{}", buf);
+			warn!("{}", buf);
 			if let Ok(prepay_resutl) = de_xml::<PrePayResult>(&buf) {
 				return Ok(prepay_resutl);
 			}
