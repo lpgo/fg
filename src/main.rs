@@ -59,6 +59,7 @@ fn main() {
 
     //template
     router.get("/pinche/index.html",wx::index_template);
+    router.get("tripDetail",wx::trip_detail_template);
     router.get("/pinche/myInfo", wx::my_info_template);
 
     router.get("/favicon.ico",wx::ico);

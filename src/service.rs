@@ -12,7 +12,7 @@ use urlencoded;
 use serde_xml;
 use std::result;
 use serde::{de,Deserialize, Serialize, Deserializer};
-use bson::{Bson, Encoder,EncoderError, Decoder, DecoderError,Document};
+use bson::{Bson, Encoder,EncoderError, Decoder, DecoderError,Document,oid};
 use mongodb;
 
 pub struct Service(Dao);
@@ -31,6 +31,7 @@ pub enum ServiceError{
     CanNotSerializeToDoc(String),
     BsonDecoderError(DecoderError),
     MongodbError(mongodb::Error),
+    BsonOidError(oid::Error),
     Other(String)
 
 }
@@ -50,6 +51,7 @@ impl fmt::Display for ServiceError {
             	ServiceError::SerdeXmlError(ref e) => e.fmt(f),
             	ServiceError::BsonEncoderError(ref e) => e.fmt(f),
             	ServiceError::BsonDecoderError(ref e) => e.fmt(f),
+            	ServiceError::BsonOidError(ref e) => e.fmt(f),
             	ServiceError::MongodbError(ref e) => e.fmt(f),
             	ServiceError::NoLogin => write!(f,"you are not  login!"),
             	ServiceError::Other(ref s) => write!(f, "{}",s)
@@ -89,7 +91,7 @@ impl Service {
 	pub fn get_user_by_id(&self,openid:&String) -> (Option<Owner>,Option<Passenger>) {
 		let o = self.0.get_by_openid::<Owner>(openid).ok();
 		let p = self.0.get_by_openid::<Passenger>(openid).ok();
-		warn!("openid is {}--{:?},{:?}",openid,o,p);
+		//warn!("openid is {}--{:?},{:?}",openid,o,p);
 		(o,p)
 	}
 
@@ -111,7 +113,9 @@ impl Service {
 		serde_json::to_string(&data).unwrap()
 	}
 
-
+	pub fn get_trip_by_oid(&self,oid:&str) -> Result<Trip> {
+		self.0.get_by_id::<Trip>(oid)
+	}
 
 	//todo
 	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String> {

@@ -273,6 +273,24 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
     }
 }
 
+pub fn trip_detail_template(req:&mut Request) -> IronResult<Response> {
+    match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+        req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
+            let oid = &hashmap.get("oid").unwrap()[0];
+            service.get_trip_by_oid(oid)
+        })
+    }) {
+            Ok(trip) => {
+                let mut resp = Response::new();
+                res_template!("tripDetail",trip,resp)
+                //Ok(Response::with((status::Ok,format!("get trip detail has error : {:?}",trip))))
+            },
+            Err(err) => {
+                Ok(Response::with((status::Ok,format!("get trip detail has error : {}",err))))
+            }
+    }
+}
+
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();

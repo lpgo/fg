@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes"  />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>天天拼车</title>
+    <link rel="stylesheet" href="/static/css/reset.css" />
+    <link rel="stylesheet" href="/static/css/buysit.css" />
+</head>
+<body>
+<div id="title">
+    行程详情
+</div>
+<div>
+    <div id="gather">
+        <p id="gathertime">
+            <span id="gathertimemonthday">{{start_time_text}}</span>
+            <!--<span id="gathertimehour">上午10:30</span>-->
+        </p>
+        <p id="gatherlocation">
+            <span id="gatherlocation1">集合地点:</span>
+            <span id="gatherlocation2">{{venue}}</span>
+        </p>
+
+    </div>
+    <div id="line">
+        <div id="linestart">
+            <i>icon</i>
+            <span id="linestartlocation">{{start}}</span>
+        </div>
+        <div id="linemoney" class="ks-clear">
+            <div class="fr">
+                <p ><span id="linemoneynum">{{price}}</span><span>元|位</span></p>
+                <p id="remainsit" >剩余{{current_seat}}座位</p>
+            </div>
+
+        </div>
+        <div id="lineend">
+            <i>icon</i>
+            <span id="lineendlocation">{{end}}</span>
+        </div>
+
+    </div>
+    <div id="linedetail">
+        <div id="linedetailhead">
+            <i id="carbrand">icon</i>
+            <div id="carbrandright">
+                <p><i>icon</i><span><i>icon</i>已经验证</span></p>
+                <p><i>星</i><i>星</i><i>星</i><i>星</i><i>星</i> <span>评分4.6</span></p>
+            </div>
+        </div>
+        <div id="linedetailfooter">
+            <i>icon</i>
+            <span>可上下浮动半小时</span>
+
+        </div>
+
+    </div>
+    <div id="lineinfo">
+        <p id="lineinfostnum">购座数量  <span>icon</span> <span>1</span> <span>icon</span></p>
+        <p id="total">合计&nbsp;:&nbsp;<span>60元</span></p>
+    </div>
+    <div id="linebutton">
+        <button type="button">购&nbsp;座</button>
+    </div>
+</div>
+</body>
+
+</html>

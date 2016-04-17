@@ -1,5 +1,5 @@
 use mongodb::Client;
-use bson::{Document,Bson};
+use bson::{Document,Bson,oid};
 use std::sync::Arc;
 use mongodb::ThreadedClient;
 use mongodb::db::{ThreadedDatabase,DatabaseInner};
@@ -72,19 +72,19 @@ impl Dao {
         })
     }
 
-    pub fn get_by_id<T>(&self,id:Bson) -> Result<T>  where T:ToDoc+Deserialize {
+    pub fn get_by_id<T>(&self,id:&str) -> Result<T>  where T:ToDoc+Deserialize {
         let coll = self.0.collection(T::get_name());
         let mut doc = Document::new();
-        //let Bson::ObjectId(_id) = id;
-        doc.insert("_id",id);
-         coll.find_one(Some(doc),None).map_err(|err|service::ServiceError::MongodbError(err)).and_then(|op|{
-            op.ok_or(service::ServiceError::Other("not find by this _id".to_string())).and_then(|doc|{
-                service::de_bson::<T>(doc)
+        oid::ObjectId::with_string(id).map_err(|err|service::ServiceError::BsonOidError(err)).map(|o|Bson::ObjectId(o)).and_then(|oid|{
+            doc.insert("_id",oid);
+            coll.find_one(Some(doc),None).map_err(|err|service::ServiceError::MongodbError(err)).and_then(|op|{
+                op.ok_or(service::ServiceError::Other("not find by this _id".to_string())).and_then(|doc|{
+                    service::de_bson::<T>(doc)
+                })
             })
         })
     }
 
-    
     pub fn get_trip_by_status(&self,status:&str) -> Vec<model::Trip>{
         let coll = self.0.collection(model::Trip::get_name());
         let mut doc = Document::new();
