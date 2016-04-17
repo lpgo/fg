@@ -12,6 +12,8 @@ use std::collections::BTreeMap;
 use uuid::Uuid;
 use md5;
 use config::ConfigManager;
+use jsonway;
+use chrono;
 
 use openssl::ssl::{Ssl, SslContext, SslStream, SslMethod, SSL_VERIFY_NONE};
 use openssl::ssl::error::StreamError as SslIoError;
@@ -203,6 +205,42 @@ pub fn pay_to_client(openid:&str,amount:&str) {
                 warn!("pay clinet result is {}",buf);
                 Ok(buf)
             });
+}
+
+pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
+	let api_key = ConfigManager::get_config_str("app", "apikey");
+	let appid = ConfigManager::get_config_str("app", "appid");
+	let time = format!("{}",chrono::Local::now().timestamp());
+	let nonce_str = Uuid::new_v4().to_simple_string();
+	let package = format!("prepay_id={}",prepay_id);
+	let mut sign = String::new();
+	{
+    		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
+    		strs.insert("appId",&appid);
+		strs.insert("timeStamp",&time);
+		strs.insert("nonceStr",&nonce_str);
+		strs.insert("package",&package);
+		strs.insert("signType","MD5");
+		let mut ss = String::new();
+		for (k,v) in strs {
+			ss.push_str(k);
+			ss.push('=');
+			ss.push_str(v);
+			ss.push('&');
+		}
+		ss.push_str("key=");
+		ss.push_str(&api_key);
+		sign= to_md5(&ss);
+	}
+	 jsonway::object(|j|{
+	      j.set("success","true".to_string());
+                    j.set("appId",appid);
+                    j.set("timeStamp",time);
+                    j.set("nonceStr",nonce_str);
+                    j.set("package",package);
+                    j.set("signType","MD5".to_string());
+                    j.set("paySign",sign);
+            })
 }
 
 pub fn to_md5(s:&str) -> String {

@@ -389,10 +389,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
         let oid  = &hashmap.get("oid").unwrap()[0];
         service.apply_trip(oid,&login_status.openid)
     }).map(|payid|{
-         jsonway::object(|j|{
-                    j.set("success",true);
-                    j.set("payid",payid);
-            })
+         pay::create_pay_json(&payid)
     });
 
     match replay {
