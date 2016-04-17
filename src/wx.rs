@@ -17,7 +17,7 @@ use hbs::Template;
 use chrono::UTC;
 use chrono::offset::local::Local;
 use chrono::offset::TimeZone;
-use std::collections::HashMap;
+use std::collections::{HashMap,BTreeMap};
 use std::io::Read;
 use std::result;
 use std::marker::{Sync,Send};
@@ -448,9 +448,11 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
     match req.get::<PersistRead<Service>>().map(|service|{
         service.get_new_trips()
     }) {
-        Ok(data) => {
-            warn!("data is ---  {:?}",data);
-            warn!("data json is {}",serde_json::to_string(&data).unwrap());
+        Ok(vec) => {
+            warn!("data is ---  {:?}",vec);
+            warn!("data json is {}",serde_json::to_string(&vec).unwrap());
+            let mut data = BTreeMap::new();
+            data.insert("vec",vec);
             res_template!("index",data,resp)
         },
         Err(err) => {
