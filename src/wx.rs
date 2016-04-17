@@ -375,8 +375,6 @@ pub fn login(req:&mut Request) -> IronResult<Response> {
 */
 pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
-    let ip = format!("{}",req.remote_addr);
-
     let replay = get_session::<LoginStatus>(req).and_then(|login_status|{
         if login_status.user_type != UserType::Anonymous {
             Some(login_status)
@@ -389,7 +387,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
         req.get_ref::<UrlEncodedBody>().map(|hashmap|(service,login_status,hashmap)).map_err(|err|ServiceError::UrlDecodingError(err))
     }).and_then(|(service,login_status,hashmap)|{
         let oid  = &hashmap.get("oid").unwrap()[0];
-        service.apply_trip(oid,&login_status.openid,ip)
+        service.apply_trip(oid,&login_status.openid)
     }).map(|payid|{
          jsonway::object(|j|{
                     j.set("success",true);

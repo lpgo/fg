@@ -64,9 +64,12 @@
         <p id="lineinfostnum">购座数量  <span>icon</span> <span>1</span> <span>icon</span></p>
         <p id="total">合计&nbsp;:&nbsp;<span>60元</span></p>
     </div>
+    <form action="/applyTrip" method="post">
+        <input type="hidden" value="{{_id.$oid}}" name = "oid">
     <div id="linebutton">
-        <button type="button">购&nbsp;座</button>
+        <input type="submit" value="购&nbsp;座">
     </div>
+    </form>
 </div>
 </body>
 

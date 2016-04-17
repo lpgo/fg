@@ -118,16 +118,16 @@ impl Service {
 	}
 
 	//todo
-	pub fn apply_trip(&self,oid:&str,openid:&str,ip:String) -> Result<String> {
+	pub fn apply_trip(&self,oid:&str,openid:&str) -> Result<String> {
 		let appid = ConfigManager::get_config_str("app", "appid");
 		let mch_id = ConfigManager::get_config_str("app", "mchid");
 		let msg = "pinchefei".to_string();
-		let prepay = PrePay::new(appid, mch_id, oid.to_owned(), msg, ip, openid.to_owned());
-		if let Ok(result) = pay::pre_pay(prepay) {
-			Ok(result.prepay_id.clone())
-		} else {
-			Err(ServiceError::Other("applay trip error".to_string()))
-		}
+		self.get_trip_by_oid(oid).and_then(|trip|{
+			self.get_line_by_id(trip.line_id).map(|line|line.price)
+		}).and_then(|price|{
+			let prepay = PrePay::new(appid, mch_id, oid.to_owned(), msg, openid.to_owned(),price);
+			pay::pre_pay(prepay).map_err(|err|ServiceError::Other(err.to_string()))
+		}).map(|result|result.prepay_id)
 	}
 
 	pub fn update_status(&self) {

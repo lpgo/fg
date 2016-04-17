@@ -30,7 +30,7 @@ pub struct PrePay {
     attach : Option<String>,
     out_trade_no : String,
     fee_type : Option<String>,
-    total_fee : i32,
+    total_fee : u32,
     spbill_create_ip : String,
     time_start : Option<String>,
     time_expire : Option<String>,
@@ -39,12 +39,12 @@ pub struct PrePay {
     trade_type : String,
     product_id : Option<String>,
     limit_pay : Option<String>,
-    openid : Option<String>
+    openid : String
 }
 
 impl PrePay {
 	
-	pub fn new(appid:String,mch_id:String,out_trade_no:String,msg:String,ip:String,openid:String) -> PrePay {
+	pub fn new(appid:String,mch_id:String,out_trade_no:String,msg:String,openid:String,fee:u32) -> PrePay {
 		let domain = ConfigManager::get_config_str("app", "domain");
 		PrePay{appid : appid,
 		    mch_id : mch_id,
@@ -56,8 +56,8 @@ impl PrePay {
 		    attach : None,
 		    out_trade_no : out_trade_no,
 		    fee_type : None,
-		    total_fee : 0,
-		    spbill_create_ip : ip,
+		    total_fee : fee,
+		    spbill_create_ip : String::new(),
 		    time_start : None,
 		    time_expire : None,
 		    goods_tag : None,
@@ -65,29 +65,50 @@ impl PrePay {
 		    trade_type : "JSAPI".to_string(),
 		    product_id : None,
 		    limit_pay : None,
-		    openid : Some(openid)
+		    openid : openid
 		}
 	}
 
     fn to_xml(&self) -> String {
+    	let fee = format!("{}",self.total_fee);
+    	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
+	strs.insert("appid",&self.appid);
+	strs.insert("body",&self.body);
+	strs.insert("mch_id",&self.mch_id);
+	strs.insert("nonce_str",&self.nonce_str);
+	strs.insert("notify_url",&self.notify_url);
+	strs.insert("openid",&self.openid);
+	strs.insert("out_trade_no",&self.out_trade_no);
+	strs.insert("spbill_create_ip","192.168.1.1");
+	strs.insert("total_fee",&fee);
+	strs.insert("trade_type","JSAPI");
+	let mut ss = String::new();
+	for (k,v) in strs {
+		ss.push_str(k);
+		ss.push('=');
+		ss.push_str(v);
+		ss.push('&');
+	}
+	ss.pop();
+	let sign = to_md5(&ss);
+
     	format!(r#"
 		    		<xml>
 					   <appid>{appid}</appid>
-					   <attach>{attach}</attach>
 					   <body>{body}</body>
 					   <mch_id>{mch_id}</mch_id>
 					   <nonce_str>{nonce_str}</nonce_str>
 					   <notify_url>{notify_url}</notify_url>
 					   <openid>{openid}</openid>
 					   <out_trade_no>{out_trade_no}</out_trade_no>
-					   <spbill_create_ip>{spbill_create_ip}</spbill_create_ip>
+					   <spbill_create_ip>192.168.1.1</spbill_create_ip>
 					   <total_fee>{total_fee}</total_fee>
 					   <trade_type>JSAPI</trade_type>
 					   <sign>{sign}</sign>
 					</xml>
-		    	"#,appid="testappid",attach="attach",body="body",mch_id="mch_id",nonce_str="nonce_str",
-		    	notify_url="notify_url",openid="openid",out_trade_no="out_trade_no",spbill_create_ip="spbill_create_ip",
-		    	total_fee="1000",sign="sign")
+		    	"#,appid=self.appid,body=self.body,mch_id=self.mch_id,nonce_str=self.nonce_str,
+		    	notify_url=self.notify_url,openid=self.openid,out_trade_no=self.out_trade_no,
+		    	total_fee=self.total_fee,sign=sign)
     }
 }
 
