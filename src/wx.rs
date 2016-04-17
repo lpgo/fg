@@ -237,8 +237,8 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
             warn!("time type is  {}",start_time);
 
             if let Ok(id) = line_id.parse::<u32>() {
-                if let Ok(seat) = seat_count.parse::<u32>() {
-                    if let Ok(start) = Local.datetime_from_str(start_time, "%Y-%m-%d %H:%M:%S") {
+                if let Ok(seat) = seat_count.parse::<u32>() { 
+                    if let Ok(start) = Local.datetime_from_str(start_time, "%Y-%m-%dT%H:%M") {
                         //start.with_timezone(&UTC);
                         let mut  t = Trip::default();
                         let line = service.get_line_by_id(id);
