@@ -248,8 +248,9 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.line_id = id;
                                 t.start = line.start;
                                 t.end = line.end;
-                                t.price = line.price;
+                                t.price = line.price as f32/100f32;
                                 t.start_time = start.timestamp();
+                                t.start_time_text = start.format("%Y-%m-%d %H:%M").to_string();
                                 t.seat_count = seat;
                                 t.current_seat = seat;
                                 t.status = TripStatus::Prepare.to_string();
