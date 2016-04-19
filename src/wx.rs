@@ -180,12 +180,14 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
 pub fn register_owner(req:&mut Request) -> IronResult<Response> {
         let service = req.get::<PersistRead<Service>>().unwrap();
         let mut login_status = get_session::<LoginStatus>(req).unwrap();
-   
+        warn!("1 \n");
         req.get_ref::<UrlEncodedBody>().and_then(|hashmap|{
             let plate_number = &hashmap.get("plate_number").unwrap()[0];
             let car_type = &hashmap.get("car_type").unwrap()[0];
+             warn!("2 \n");
             let openid = login_status.openid.clone();
             let p = login_status.passenger.as_ref().unwrap();
+             warn!("3 \n");
             let owner = Owner::new(p.tel.clone(),car_type.clone(),plate_number.clone(),openid);
             service.add_owner(owner.clone());
             login_status.owner = Some(owner);
@@ -195,6 +197,7 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
         let mut resp = Response::new();
         let ls = login_status.clone();
         set_session::<LoginStatus>(req, &mut resp, login_status);
+         warn!("4 \n");
         res_template!("publishTrip",ls.owner.unwrap(),resp)
 }
 
