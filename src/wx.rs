@@ -296,7 +296,11 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
     match req.body.read_to_string(& mut buf) {
         Ok(_) => {
             warn!("pay_result is {}",buf);
-            Ok(Response::with(status::Ok))
+            let result = r#"<xml>
+              <return_code><![CDATA[SUCCESS]]></return_code>
+              <return_msg><![CDATA[OK]]></return_msg>
+            </xml>"#;
+            Ok(Response::with((status::Ok,result)))
         },
         Err(err) => {
             warn!("pay_result error is {}",err);
@@ -333,7 +337,7 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         if to_owner {
             redirect!("/static/driverregister.html")
         } else {
-            res_template!("index",data,resp)
+            redirect_index(req, resp)
         }
     } else  {
         Ok(Response::with((status::Ok,"validate passenger faile")))
@@ -474,12 +478,14 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
         set_session::<LoginStatus>(req, &mut resp, login_status);
         Ok(())
     });
+    redirect_index(req, resp)
+}
+
+pub fn redirect_index(req: &mut Request,mut resp:Response) -> IronResult<Response> {
     match req.get::<PersistRead<Service>>().map(|service|{
         service.get_new_trips()
     }) {
         Ok(vec) => {
-            warn!("data is ---  {:?}",vec);
-            warn!("data json is {}",serde_json::to_string(&vec).unwrap());
             let mut data = BTreeMap::new();
             data.insert("vec",vec);
             res_template!("index",data,resp)
@@ -507,7 +513,7 @@ pub fn get_web_token(code:&str) -> Result<ApiResult> {
 }
 
 
-pub fn my_info_template(req: &mut Request) -> IronResult<Response> {
+pub fn my_info_template(req: &mut Request) -> IronResult<Response>  {
     let mut resp = Response::new();
     let login_status = get_session::<LoginStatus>(req).unwrap();
     let user_info = get_wx_user(&login_status.web_token.unwrap(), &login_status.openid);

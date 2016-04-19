@@ -29,7 +29,7 @@ pub struct PrePay {
     sign : String,
     body : String,
     detail : Option<String>,
-    attach : Option<String>,
+    attach : String,
     out_trade_no : String,
     fee_type : Option<String>,
     total_fee : u32,
@@ -46,17 +46,19 @@ pub struct PrePay {
 
 impl PrePay {
 	
-	pub fn new(appid:String,mch_id:String,out_trade_no:String,msg:String,openid:String,fee:u32) -> PrePay {
+	pub fn new(order_id:String,trip_id:String,msg:String,openid:String,fee:u32) -> PrePay {
 		let domain = ConfigManager::get_config_str("app", "domain");
+		let appid = ConfigManager::get_config_str("app", "appid");
+		let mch_id = ConfigManager::get_config_str("app", "mchid");
 		PrePay{appid : appid,
 		    mch_id : mch_id,
 		    device_info : None,
-		    nonce_str : out_trade_no.clone(),
+		    nonce_str : order_id.clone(),
 		    sign : String::new(),
 		    body : msg,
 		    detail : None,
-		    attach : None,
-		    out_trade_no : out_trade_no,
+		    attach : trip_id,
+		    out_trade_no : order_id,
 		    fee_type : None,
 		    total_fee : fee,
 		    spbill_create_ip : String::new(),
@@ -77,6 +79,7 @@ impl PrePay {
     	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
 	strs.insert("appid",&self.appid);
 	strs.insert("body",&self.body);
+	strs.insert("attach", &self.attach);
 	strs.insert("mch_id",&self.mch_id);
 	strs.insert("nonce_str",&self.nonce_str);
 	strs.insert("notify_url",&self.notify_url);
@@ -100,6 +103,7 @@ impl PrePay {
     	format!(r#"
 		    		<xml>
 					   <appid>{appid}</appid>
+					   <attach>{attach}</attach>
 					   <body>{body}</body>
 					   <mch_id>{mch_id}</mch_id>
 					   <nonce_str>{nonce_str}</nonce_str>
@@ -113,7 +117,7 @@ impl PrePay {
 					</xml>
 		    	"#,appid=self.appid,body=self.body,mch_id=self.mch_id,nonce_str=self.nonce_str,
 		    	notify_url=self.notify_url,openid=self.openid,out_trade_no=self.out_trade_no,
-		    	total_fee=self.total_fee,sign=sign)
+		    	total_fee=self.total_fee,sign=sign,attach=self.attach)
     }
 }
 

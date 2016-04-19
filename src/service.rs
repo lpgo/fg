@@ -14,6 +14,7 @@ use std::result;
 use serde::{de,Deserialize, Serialize, Deserializer};
 use bson::{Bson, Encoder,EncoderError, Decoder, DecoderError,Document,oid};
 use mongodb;
+use uuid::Uuid;
 
 pub struct Service(Dao);
 
@@ -119,13 +120,12 @@ impl Service {
 
 	//todo
 	pub fn apply_trip(&self,oid:&str,openid:&str) -> Result<String> {
-		let appid = ConfigManager::get_config_str("app", "appid");
-		let mch_id = ConfigManager::get_config_str("app", "mchid");
+		let order_id = Uuid::new_v4().to_simple_string();
 		let msg = "pinchefei".to_string();
 		self.get_trip_by_oid(oid).and_then(|trip|{
 			self.get_line_by_id(trip.line_id).map(|line|line.price)
 		}).and_then(|price|{
-			let prepay = PrePay::new(appid, mch_id, oid.to_owned(), msg, openid.to_owned(),price);
+			let prepay = PrePay::new(order_id, oid.to_owned(), msg, openid.to_owned(),price);
 			pay::pre_pay(prepay).map_err(|err|ServiceError::Other(err.to_string()))
 		}).map(|result|result.prepay_id)
 	}
