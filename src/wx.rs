@@ -312,19 +312,18 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
-    warn!("after get session");
     let mut success = false;
     let mut to_owner = false;
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {       
             let tel = &hashmap.get("tel").unwrap()[0];
             let code = &hashmap.get("code").unwrap()[0];
-            let owner = &hashmap.get("owner").unwrap()[0];
+            let owner = &hashmap.get("owner");
             //to-do validate code 
             let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
             service.add_passenger(p).unwrap();
             success = true;
-            if !owner.is_empty() {
+            if owner.is_some() {
                 to_owner = true;
             }
         },
@@ -334,7 +333,6 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         login_status.user_type  = UserType::Passenger;
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
-        let data = model::make_data();
         if to_owner {
             redirect!("/static/driverregister.html")
         } else {
