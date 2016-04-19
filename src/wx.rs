@@ -312,6 +312,7 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
+    warn!("after get session");
     let mut success = false;
     let mut to_owner = false;
     match req.get_ref::<UrlEncodedBody>() {
@@ -464,14 +465,24 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
             req.get::<PersistRead<Service>>().ok().map(|service|(service,openid))
         }).and_then(|(service,openid)|{
             let (o,p) = service.get_user_by_id(&openid);
-            p.map(|passenger|{
-                login_status.user_type = UserType::Passenger;
-                login_status.passenger = Some(passenger);
-            });
-            o.map(|owner|{
-                login_status.user_type = UserType::Owner;
-                login_status.owner = Some(owner);
-            });
+            match (o,p) {
+                (None,Some(passenger)) => {
+                    login_status.user_type = UserType::Passenger;
+                    login_status.passenger = Some(passenger);
+                },
+                (Some(owner),None) => {
+                    login_status.user_type = UserType::Owner;
+                    login_status.owner = Some(owner);
+                },
+                (Some(owner),Some(passenger)) => {
+                    login_status.user_type = UserType::Owner;
+                    login_status.owner = Some(owner);
+                    login_status.passenger = Some(passenger);
+                },
+                (None,None) => {
+                    login_status.user_type = UserType::Anonymous;
+                }
+            }
             Some(())
         });
 
