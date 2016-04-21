@@ -321,7 +321,8 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
             let owner = &hashmap.get("owner");
             //to-do validate code 
             let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
-            service.add_passenger(p).unwrap();
+            service.add_passenger(p.clone()).unwrap();
+            login_status.passenger = Some(p);
             success = true;
             if owner.is_some() {
                 to_owner = true;
