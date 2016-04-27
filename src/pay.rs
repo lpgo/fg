@@ -251,7 +251,7 @@ pub fn send_sms() {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
 	let now = Local::now();
-	let time = format!("{}-{}-{}+{}%3a{}%3a{}",now.year(),now.month(),now.day(),now.hour(),now.minute(),now.second());
+	let time = format!("{}-{}-{}+00%3a{}%3a{}",now.year(),now.month(),now.day(),now.minute(),now.second());
 	
 	let mut content = String::new();
 	{
