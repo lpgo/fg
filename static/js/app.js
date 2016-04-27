@@ -49,7 +49,15 @@ app.config(function($routeProvider){
     templateUrl:"/static/main.html",
     controller:"MainCtrl"
   });
+  $routeProvider.when("/buysit",{
+    templateUrl:"/static/buysit.html",
+    controller:"BuySeatCtrl"
+  });
 })
+
+app.controller('BuySeatCtrl', ['$scope', function($scope){
+	
+}])
 
 app.controller('ListCtrl', ['$scope', function($scope){
 	$scope.count = 15;
