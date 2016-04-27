@@ -13,7 +13,8 @@ use uuid::Uuid;
 use md5;
 use config::ConfigManager;
 use jsonway;
-use chrono::*;
+use chrono;
+use url;
 
 use openssl::ssl::{Ssl, SslContext, SslStream, SslMethod, SSL_VERIFY_NONE};
 use openssl::ssl::error::StreamError as SslIoError;
@@ -214,7 +215,7 @@ pub fn pay_to_client(openid:&str,amount:&str) {
 pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 	let api_key = ConfigManager::get_config_str("app", "apikey");
 	let appid = ConfigManager::get_config_str("app", "appid");
-	let time = format!("{}",Local::now().timestamp());
+	let time = format!("{}",chrono::Local::now().timestamp());
 	let nonce_str = Uuid::new_v4().to_simple_string();
 	let package = format!("prepay_id={}",prepay_id);
 	let mut sign = String::new();
@@ -250,22 +251,20 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 pub fn send_sms() {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
-	let now = Local::now();
-	let time = format!("{}-{}-{}+00%3A{}%3A{}",now.year(),now.month(),now.day(),now.minute(),now.second());
-	
+	let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
 	let mut content = String::new();
 	{
     		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
     		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
 		strs.insert("app_key",&key);
-		strs.insert("timestamp","2016-04-28+00%3A30%3A36");
+		strs.insert("timestamp",&now);
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
-		strs.insert("sms_free_sign_name","%E9%98%BF%E9%87%8C%E5%A4%A7%E9%B1%BC");
+		strs.insert("sms_free_sign_name","阿里大鱼");
 		strs.insert("rec_num","18681926648");
 		strs.insert("sms_template_code","SMS_7425163");
-		strs.insert("sms_param","%7B%5C%22code%5C%22%3A%5C%221234%5C%22%2C%5C%22product%5C%22%3A%5C%22alidayu%5C%22%7D");
+		strs.insert("sms_param","{\"code\":\"4444\",\"product\":\"ttpc\"}");
 		let mut ss = String::new();
 		ss.push_str(&secret);
 		for (k,v) in strs.clone() {
@@ -276,17 +275,12 @@ pub fn send_sms() {
 		warn!("sign is {}",ss);
 		let sign= to_md5(&ss);
 
-		let mut ss = String::new();
+		let mut encode = url::form_urlencoded::Serializer::new(String::new());
 		for (k,v) in strs {
-			ss.push_str(k);
-			ss.push('=');
-			ss.push_str(v);
-			ss.push('&');
+			encode.append_pair(k, v);
 		}
-		ss.push_str("sign");
-		ss.push('=');
-		ss.push_str(&sign);
-		content = ss;
+		encode.append_pair("sign",&sign);
+		content = encode.finish();
 	}
 	warn!("content : {}",content);
 	let client = ssl_client();

@@ -23,6 +23,7 @@ extern crate chrono;
 extern crate jsonway;
 extern crate md5;
 extern crate toml;
+extern crate url;
 #[macro_use] extern crate lazy_static;
 
 macro_rules! res_template {

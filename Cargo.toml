@@ -37,6 +37,7 @@ chrono="*"
 md5="*"
 toml="*"
 lazy_static="*"
+url="*"
 
 [features]
 default=["serde_type"]
