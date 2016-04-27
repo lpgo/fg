@@ -258,14 +258,14 @@ pub fn send_sms() {
     		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
     		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
 		strs.insert("app_key",&key);
-		strs.insert("timestamp","2016-04-28+00%3A20%3A36");
+		strs.insert("timestamp","2016-04-28+00%3A30%3A36");
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
-		strs.insert("sms_free_sign_name","%e8%ba%ab%e4%bb%bd%e9%aa%8c%e8%af%81");
+		strs.insert("sms_free_sign_name","%E9%98%BF%E9%87%8C%E5%A4%A7%E9%B1%BC");
 		strs.insert("rec_num","18681926648");
 		strs.insert("sms_template_code","SMS_7425163");
-		strs.insert("sms_param","%7b%26quot%3bcode%26quot%3b%3a%26quot%3b1234%26quot%3b%2c%26quot%3bproduct%26quot%3b%3a%26quot%3btianitanpinche%26quot%3b%7d");
+		strs.insert("sms_param","%7B%5C%22code%5C%22%3A%5C%221234%5C%22%2C%5C%22product%5C%22%3A%5C%22alidayu%5C%22%7D");
 		let mut ss = String::new();
 		ss.push_str(&secret);
 		for (k,v) in strs.clone() {
