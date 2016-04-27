@@ -271,6 +271,7 @@ pub fn send_sms() {
 			ss.push_str(v);
 		}
 		ss.push_str(&secret);
+		warn!("sign is {}",ss);
 		let sign= to_md5(&ss);
 
 		let mut ss = String::new();
