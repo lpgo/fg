@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="app">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
@@ -64,7 +64,7 @@
 
         </div>
     </div>
-    <div id="newpost">
+    <div id="newpost" ng-controller="ListCtrl">
         <div class="newposttitle">最新发布</div>
         <div class="newpostitem">
             <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
@@ -102,7 +102,7 @@
                 <span>60元|人</span>
             </div>
             <div class="newpostseat">
-                <span>余2座</span>
+                <span>余{{count}}座</span>
             </div>
             <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
 
@@ -110,6 +110,8 @@
     </div>
 
 </div>
-
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.5/angular-route.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
 </body>
 </html>
