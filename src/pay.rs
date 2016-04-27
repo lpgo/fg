@@ -13,7 +13,7 @@ use uuid::Uuid;
 use md5;
 use config::ConfigManager;
 use jsonway;
-use chrono;
+use chrono::*;
 
 use openssl::ssl::{Ssl, SslContext, SslStream, SslMethod, SSL_VERIFY_NONE};
 use openssl::ssl::error::StreamError as SslIoError;
@@ -214,7 +214,7 @@ pub fn pay_to_client(openid:&str,amount:&str) {
 pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 	let api_key = ConfigManager::get_config_str("app", "apikey");
 	let appid = ConfigManager::get_config_str("app", "appid");
-	let time = format!("{}",chrono::Local::now().timestamp());
+	let time = format!("{}",Local::now().timestamp());
 	let nonce_str = Uuid::new_v4().to_simple_string();
 	let package = format!("prepay_id={}",prepay_id);
 	let mut sign = String::new();
@@ -250,14 +250,15 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 pub fn send_sms() {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
-	let now = chrono::Local::now().format("%Y-%m-%d+%H%3a%M%3a%S").to_string();
+	let now = Local::now();
+	let time = format!("{}-{}-{}+{}%3a{}%3a{}",now.year(),now.month(),now.day(),now.hour(),now.minute(),now.second());
 	
 	let mut content = String::new();
 	{
     		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
     		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
 		strs.insert("app_key",&key);
-		strs.insert("timestamp",&now);
+		strs.insert("timestamp",&time);
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
