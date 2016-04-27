@@ -434,10 +434,8 @@ pub fn get_hot_lines(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn test(req: &mut Request) -> IronResult<Response> {
-    let data = model::make_data();
-    let mut resp = Response::new();
     pay::send_sms();
-    res_template!("index",data,resp)
+    Ok(Response::with(status::Ok))
 }
 
 pub fn ico(req: &mut Request) -> IronResult<Response> {
