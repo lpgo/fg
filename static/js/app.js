@@ -46,7 +46,7 @@ var app = angular.module('app',['ngRoute'],function($httpProvider) {
 
 app.config(function($routeProvider){
   $routeProvider.when("/",{
-    templateUrl:"main.html",
+    templateUrl:"/static/main.html",
     controller:"MainCtrl"
   });
 })
