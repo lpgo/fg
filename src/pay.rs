@@ -261,7 +261,7 @@ pub fn send_sms() {
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
-		strs.insert("sms_free_sign_name","阿里大鱼");
+		strs.insert("sms_free_sign_name","身份验证");
 		strs.insert("rec_num","18681926648");
 		strs.insert("sms_template_code","SMS_7425163");
 		strs.insert("sms_param","{\"code\":\"4444\",\"product\":\"ttpc\"}");
