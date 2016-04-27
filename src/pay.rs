@@ -258,7 +258,7 @@ pub fn send_sms() {
     		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
     		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
 		strs.insert("app_key",&key);
-		strs.insert("timestamp",&time);
+		strs.insert("timestamp","2016-04-28+00%3A20%3A36");
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
