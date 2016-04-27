@@ -247,6 +247,56 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
             })
 }
 
+pub fn send_sms() {
+	let key = ConfigManager::get_config_str("app", "alikey");
+	let secret = ConfigManager::get_config_str("app", "alisecret");
+	let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+	let mut content = String::new();
+	{
+    		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
+    		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
+		strs.insert("app_key",&key);
+		strs.insert("timestamp",&now);
+		strs.insert("v","2.0");
+		strs.insert("sign_method","md5");
+		strs.insert("sms_type","normal");
+		strs.insert("sms_free_sign_name","身份验证");
+		strs.insert("rec_num","18681926648");
+		strs.insert("sms_template_code","SMS_7425163");
+		strs.insert("sms_param","{\"code\":\"1234\",\"product\":\"tianitanpinche\"}");
+		let mut ss = String::new();
+		ss.push_str(&secret);
+		for (k,v) in strs.clone() {
+			ss.push_str(k);
+			ss.push_str(v);
+		}
+		ss.push_str(&secret);
+		let sign= to_md5(&ss);
+
+		let mut ss = String::new();
+		for (k,v) in strs {
+			ss.push_str(k);
+			ss.push('=');
+			ss.push_str(v);
+			ss.push('&');
+		}
+		ss.push_str("sign");
+		ss.push('=');
+		ss.push_str(&sign);
+		content = ss;
+	}
+	warn!("content : {}",content);
+	let client = ssl_client();
+             	let url = "https://eco.taobao.com/router/rest";
+            	client.post(url).body(&content).send().and_then(|mut res|{
+                	let mut buf = String::new();
+                	res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+           	 }).and_then(|buf|{
+                	warn!("pay clinet result is {}",buf);
+                	Ok(buf)
+            	});
+}
+
 pub fn to_md5(s:&str) -> String {
 	let mut context = md5::Context::new();
             context.consume(s.as_bytes());
