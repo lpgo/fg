@@ -260,7 +260,7 @@ pub fn send_sms() {
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
-		strs.insert("sms_free_sign_name","身份验证");
+		strs.insert("sms_free_sign_name","%e8%ba%ab%e4%bb%bd%e9%aa%8c%e8%af%81");
 		strs.insert("rec_num","18681926648");
 		strs.insert("sms_template_code","SMS_7425163");
 		strs.insert("sms_param","{\"code\":\"1234\",\"product\":\"tianitanpinche\"}");
@@ -289,7 +289,7 @@ pub fn send_sms() {
 	warn!("content : {}",content);
 	let client = ssl_client();
              	let url = "https://eco.taobao.com/router/rest";
-            	client.post(url).body(&content).send().and_then(|mut res|{
+            	client.post(url).header(hyper::header::ContentType::form_url_encoded()).body(&content).send().and_then(|mut res|{
                 	let mut buf = String::new();
                 	res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
            	 }).and_then(|buf|{
