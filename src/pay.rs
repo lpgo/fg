@@ -250,7 +250,8 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 pub fn send_sms() {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
-	let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+	let now = chrono::Local::now().format("%Y-%m-%d+%H%3a%M%3a%S").to_string();
+	
 	let mut content = String::new();
 	{
     		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
@@ -263,7 +264,7 @@ pub fn send_sms() {
 		strs.insert("sms_free_sign_name","%e8%ba%ab%e4%bb%bd%e9%aa%8c%e8%af%81");
 		strs.insert("rec_num","18681926648");
 		strs.insert("sms_template_code","SMS_7425163");
-		strs.insert("sms_param","{\"code\":\"1234\",\"product\":\"tianitanpinche\"}");
+		strs.insert("sms_param","%7b%26quot%3bcode%26quot%3b%3a%26quot%3b1234%26quot%3b%2c%26quot%3bproduct%26quot%3b%3a%26quot%3btianitanpinche%26quot%3b%7d");
 		let mut ss = String::new();
 		ss.push_str(&secret);
 		for (k,v) in strs.clone() {
