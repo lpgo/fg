@@ -59,8 +59,11 @@ app.controller('BuySeatCtrl', ['$scope', function($scope){
 	
 }])
 
-app.controller('ListCtrl', ['$scope', function($scope){
+app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
 	$scope.count = 15;
+	$scope.buySeat = function() {
+		$location.url("/buysit");
+	}
 }])
 
 app.controller('MainCtrl', ['$scope', function($scope){
