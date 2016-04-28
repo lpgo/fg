@@ -544,18 +544,18 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
 pub fn get_code(req: &mut Request) -> IronResult<Response> {
     let mut  res = Response::new();
     match req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
-        &hashmap.get("tel").unwrap()[0]
+        &hashmap.get("tel").unwrap()[0].clone();
     }).and_then(|tel|{
         let mut rng = thread_rng();
         let n: u32 = rng.gen_range(1000, 9999);
-        pay::send_sms(tel,n);
+        pay::send_sms(&tel,n);
 
         get_session::<LoginStatus>(req).map(|login_status|{
             login_status.code = Some(n);
+            login_status
         }).ok_or(ServiceError::NoLogin)
     }).map(|login_status|{
-        set_session(req, &mut res, login_status)
-        Ok(())
+        set_session(req, &mut res, login_status);
     }) {
         Ok(_) => {
             Ok(Response::with((status::Ok,"{success:true}")))
