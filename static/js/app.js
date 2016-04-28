@@ -49,7 +49,7 @@ app.config(function($routeProvider){
     templateUrl:"/static/main.html",
     controller:"MainCtrl"
   });
-  $routeProvider.when("/buysit",{
+  $routeProvider.when("/buysit/:oid",{
     templateUrl:"/static/buysit.html",
     controller:"BuySeatCtrl"
   });
@@ -59,14 +59,13 @@ app.config(function($routeProvider){
   });
 });
 
-app.controller('BuySeatCtrl', ['$scope', function($scope){
+app.controller('BuySeatCtrl', ['$scope','$routeParams', function($scope,$routeParams){
 	
 }]);
 
 app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
-	$scope.count = 15;
-	$scope.buySeat = function() {
-		$location.url("/buysit");
+	$scope.buySeat = function(oid) {
+		$location.url("/buysit/"+oid);
 	}
 }]);
 
