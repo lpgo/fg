@@ -80,7 +80,7 @@ app.controller('MainCtrl', ['$scope','$http', function($scope,$http){
        $scope.getTrips();
 }]);
 
-app.controller('ConfirmationCtrl', ['$scope','$http','$location', function(%scope,$http,$location){
+app.controller('ConfirmationCtrl', ['$scope','$http','$location', function($scope,$http,$location){
 
   $scope.tel = "";
   $scope.code = "";
