@@ -555,7 +555,7 @@ pub fn get_code(req: &mut Request) -> IronResult<Response> {
             login_status
         }).ok_or(ServiceError::NoLogin)
     }).map(|login_status|{
-        set_session(req, &mut res, login_status);
+        set_session::<LoginStatus>(req, &mut res, login_status);
     }) {
         Ok(_) => {
             Ok(Response::with((status::Ok,"{success:true}")))
