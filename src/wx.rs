@@ -550,13 +550,14 @@ pub fn get_code(req: &mut Request) -> IronResult<Response> {
         let n: u32 = rng.gen_range(1000, 9999);
         pay::send_sms(tel,n);
 
-        get_session::<LoginStatus>(req).and_then(|login_status|{
+        get_session::<LoginStatus>(req).map(|login_status|{
             login_status.code = Some(n);
-            set_session::<LoginStatus>(req, &mut res, login_status);
-		Some(n)
         }).ok_or(ServiceError::NoLogin)
+    }).map(|login_status|{
+        set_session(req, &mut res, login_status)
+        Ok(())
     }) {
-        Ok(n) => {
+        Ok(_) => {
             Ok(Response::with((status::Ok,"{success:true}")))
         },
         Err(err) => {
