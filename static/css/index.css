@@ -294,8 +294,8 @@ body {
 }
 .slide.ng-enter,
 .slide.ng-leave {
-    -webkit-transition: all 1s ease;
-    transition: all 1s ease;
+    -webkit-transition: all 0.5s ease;
+    transition: all 0.5s ease;
 }
 .slide.ng-enter {
     left: 100%;

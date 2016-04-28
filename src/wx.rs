@@ -435,7 +435,6 @@ pub fn get_hot_lines(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn test(req: &mut Request) -> IronResult<Response> {
-    pay::send_sms();
     Ok(Response::with(status::Ok))
 }
 
@@ -543,18 +542,19 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
 }
 
 pub fn get_code(req: &mut Request) -> IronResult<Response> {
-    let res = Response::new();
+    let mut  res = Response::new();
     match req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
         &hashmap.get("tel").unwrap()[0]
     }).and_then(|tel|{
         let mut rng = thread_rng();
         let n: u32 = rng.gen_range(1000, 9999);
-        pay.send_sms(tel,n);
+        pay::send_sms(tel,n);
 
         get_session::<LoginStatus>(req).and_then(|login_status|{
             login_status.code = Some(n);
-            set_session::<LoginStatus>(req, res, login_status).map(||n)
-        })
+            set_session::<LoginStatus>(req, &mut res, login_status);
+		Some(n)
+        }).ok_or(ServiceError::NoLogin)
     }) {
         Ok(n) => {
             Ok(Response::with((status::Ok,"{success:true}")))

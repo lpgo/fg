@@ -248,11 +248,11 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
             })
 }
 
-pub fn send_sms(tel:&str,code:&str) {
+pub fn send_sms(tel:&str,code:u32) {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
 	let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-	let sms_param = format!("{\"code\":\"{}\",\"product\":\"天天拼车\"}",code);
+	let sms_param = format!("{{\"code\":\"{}\",\"product\":\"天天拼车\"}}",code);
 	let mut content = String::new();
 	{
     	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
