@@ -38,6 +38,7 @@ md5="*"
 toml="*"
 lazy_static="*"
 url="*"
+rand="*"
 
 [features]
 default=["serde_type"]

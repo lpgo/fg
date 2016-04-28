@@ -248,23 +248,24 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
             })
 }
 
-pub fn send_sms() {
+pub fn send_sms(tel:&str,code:&str) {
 	let key = ConfigManager::get_config_str("app", "alikey");
 	let secret = ConfigManager::get_config_str("app", "alisecret");
 	let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+	let sms_param = format!("{\"code\":\"{}\",\"product\":\"天天拼车\"}",code);
 	let mut content = String::new();
 	{
-    		let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
-    		strs.insert("method","alibaba.aliqin.fc.sms.num.send");
+    	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
+    	strs.insert("method","alibaba.aliqin.fc.sms.num.send");
 		strs.insert("app_key",&key);
 		strs.insert("timestamp",&now);
 		strs.insert("v","2.0");
 		strs.insert("sign_method","md5");
 		strs.insert("sms_type","normal");
 		strs.insert("sms_free_sign_name","身份验证");
-		strs.insert("rec_num","18681926648");
+		strs.insert("rec_num",tel);
 		strs.insert("sms_template_code","SMS_7425163");
-		strs.insert("sms_param","{\"code\":\"4444\",\"product\":\"ttpc\"}");
+		strs.insert("sms_param",&sms_param);
 		let mut ss = String::new();
 		ss.push_str(&secret);
 		for (k,v) in strs.clone() {
@@ -272,9 +273,7 @@ pub fn send_sms() {
 			ss.push_str(v);
 		}
 		ss.push_str(&secret);
-		warn!("sign is {}",ss);
 		let sign= to_md5(&ss);
-
 		let mut encode = url::form_urlencoded::Serializer::new(String::new());
 		for (k,v) in strs {
 			encode.append_pair(k, v);
@@ -282,16 +281,15 @@ pub fn send_sms() {
 		encode.append_pair("sign",&sign);
 		content = encode.finish();
 	}
-	warn!("content : {}",content);
 	let client = ssl_client();
-             	let url = "https://eco.taobao.com/router/rest";
-            	client.post(url).header(hyper::header::ContentType::form_url_encoded()).body(&content).send().and_then(|mut res|{
-                	let mut buf = String::new();
-                	res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
-           	 }).and_then(|buf|{
-                	warn!("pay clinet result is {}",buf);
-                	Ok(buf)
-            	});
+    let url = "https://eco.taobao.com/router/rest";
+    client.post(url).header(hyper::header::ContentType::form_url_encoded()).body(&content).send().and_then(|mut res|{
+        let mut buf = String::new();
+        res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+    }).and_then(|buf|{
+        warn!("pay clinet result is {}",buf);
+        Ok(buf)
+    });
 }
 
 pub fn to_md5(s:&str) -> String {

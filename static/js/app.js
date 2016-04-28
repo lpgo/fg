@@ -53,19 +53,49 @@ app.config(function($routeProvider){
     templateUrl:"/static/buysit.html",
     controller:"BuySeatCtrl"
   });
-})
+  $routeProvider.when("/confirmation",{
+    templateUrl:"/static/confirmation.html",
+    controller:"ConfirmationCtrl"
+  });
+});
 
 app.controller('BuySeatCtrl', ['$scope', function($scope){
 	
-}])
+}]);
 
 app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
 	$scope.count = 15;
 	$scope.buySeat = function() {
 		$location.url("/buysit");
 	}
-}])
+}]);
 
 app.controller('MainCtrl', ['$scope', function($scope){
 	
-}])
+}]);
+
+app.controller('ConfirmationCtrl', ['$scope','$http','$location', function(%scope,$http,$location){
+
+  $scope.tel = "";
+  $scope.code = "";
+
+  %scope.getCode = function() {
+    $http.post("/getCode",$scope).success(function(data){
+      if(!data.success) {
+        alert("get code error");
+      }
+
+    });
+  };
+
+  $scope.registerPassenger = function() {
+    $http.post("/registerPassenger",$scope).success(function(data){
+      if(data.success) {
+        $location.url(data.redirect);
+      } else {
+        alert("registerPassenger error");
+      }
+    });
+  };
+
+}]);

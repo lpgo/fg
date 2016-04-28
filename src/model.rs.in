@@ -121,7 +121,8 @@ pub struct LoginStatus {
     pub web_token : Option<String>,
     pub refresh_token : Option<String>,
     pub passenger:Option<Passenger>,
-    pub owner:Option<Owner>
+    pub owner:Option<Owner>,
+    pub code:Option<u32>
 }
 
 impl Key for LoginStatus {

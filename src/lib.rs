@@ -24,6 +24,7 @@ extern crate jsonway;
 extern crate md5;
 extern crate toml;
 extern crate url;
+extern crate rand;
 #[macro_use] extern crate lazy_static;
 
 macro_rules! res_template {
@@ -41,6 +42,16 @@ macro_rules! redirect {
 	let url = Url::parse(&urlstr).unwrap();
 	response.set_mut(status::Found).set_mut(Redirect(url));
 	Ok(response)
+    })  
+}
+
+macro_rules! redirect2 {
+    ($url:expr,$resp:expr) => ({
+    let domain = ConfigManager::get_config_str("app", "domain");
+    let urlstr = domain+$url;
+	let url = Url::parse(&urlstr).unwrap();
+	$resp.set_mut(status::Found).set_mut(Redirect(url));
+	Ok($resp)
     })  
 }
 

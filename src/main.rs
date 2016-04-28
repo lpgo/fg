@@ -58,6 +58,7 @@ fn main() {
     router.post("/getHotLines",wx::get_hot_lines);
     router.post("/payResult",wx::pay_result);
     router.get("/payResult",wx::pay_result);
+    router.post("/getCode", wx::get_code);
 
     //template
     router.get("/pinche/index.html",wx::index_template);

@@ -27,6 +27,7 @@ use serde_json;
 use hyper;
 use config::ConfigManager;
 use rustc_serialize::json;
+use rand::{thread_rng, Rng};
 
 pub type Result<T> = result::Result<T, ServiceError>;
 
@@ -335,12 +336,12 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
         if to_owner {
-            redirect!("/static/driverregister.html")
+            Ok(Response::with((status::Ok,"{success:true,redirect:\"/driverregister\"}")))
         } else {
-            redirect_index(req, resp)
+            Ok(Response::with((status::Ok,"{success:true,redirect:\"/\"}")))
         }
     } else  {
-        Ok(Response::with((status::Ok,"validate passenger faile")))
+        Ok(Response::with((status::Ok,"{success:false}")))
     }
     
 }
@@ -487,7 +488,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
         set_session::<LoginStatus>(req, &mut resp, login_status);
         Ok(())
     });
-    redirect_index(req, resp)
+    redirect2!("/static/index.html", resp)
 }
 
 pub fn redirect_index(req: &mut Request,mut resp:Response) -> IronResult<Response> {
@@ -541,7 +542,29 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
     }).unwrap()
 }
 
+pub fn get_code(req: &mut Request) -> IronResult<Response> {
+    let res = Response::new();
+    match req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
+        &hashmap.get("tel").unwrap()[0]
+    }).and_then(|tel|{
+        let mut rng = thread_rng();
+        let n: u32 = rng.gen_range(1000, 9999);
+        pay.send_sms(tel,n);
 
+        get_session::<LoginStatus>(req).and_then(|login_status|{
+            login_status.code = Some(n);
+            set_session::<LoginStatus>(req, res, login_status).map(||n)
+        })
+    }) {
+        Ok(n) => {
+            Ok(Response::with((status::Ok,"{success:true}")))
+        },
+        Err(err) => {
+            warn!("get code error is {}",err);
+            Ok(Response::with((status::Ok,"{success:false}")))
+        }
+    }
+}
 
 pub fn set_session<K:Key>(req: &mut Request,res:&mut Response,value:K::Value) where K::Value:Clone{
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
