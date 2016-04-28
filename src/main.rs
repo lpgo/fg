@@ -52,7 +52,7 @@ fn main() {
     //router.post("/login",wx::login);
     router.post("/publishTrip",wx::publish_trip);
     router.get("/canPublishTrip", wx::can_publish_trip);
-    //router.post("/getTrips", wx::get_trips);
+    router.post("/getTrips", wx::get_trips);
     router.post("/applyTrip",wx::apply_trip);
     router.post("/getLines", wx::get_lines);
     router.post("/getHotLines",wx::get_hot_lines);

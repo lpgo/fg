@@ -345,13 +345,23 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     }
     
 }
-/*
+
 pub fn get_trips(req:&mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
-    Ok(Response::with((status::Ok,service.get_new_trips())))
+    match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+            serde_json::to_string(&service.get_new_trips()).map_err(|err|ServiceError::SerdeJsonError(err))
+    }) {
+        Ok(s) => {
+            let trips:&str = s.as_ref();
+            Ok(Response::with((status::Ok,trips)))
+        },
+        Err(err) => {
+            warn!("get trips error : {}",err);
+            Ok(Response::with((status::Ok,"[]")))
+        }
+    }
 }
 
-
+/*
 pub fn login(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut openid = String::new();

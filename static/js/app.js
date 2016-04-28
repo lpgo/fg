@@ -70,8 +70,14 @@ app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
 	}
 }]);
 
-app.controller('MainCtrl', ['$scope', function($scope){
-	
+app.controller('MainCtrl', ['$scope','$http', function($scope,$http){
+	$scope.data = [];
+       $scope.getTrips = function() {
+          $http.post("/getTrips",null).success(function(d){
+            $scope.data = d;
+          });
+       };
+       $scope.getTrips();
 }]);
 
 app.controller('ConfirmationCtrl', ['$scope','$http','$location', function(%scope,$http,$location){
@@ -79,7 +85,7 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location', function(%scop
   $scope.tel = "";
   $scope.code = "";
 
-  %scope.getCode = function() {
+  $scope.getCode = function() {
     $http.post("/getCode",$scope).success(function(data){
       if(!data.success) {
         alert("get code error");
