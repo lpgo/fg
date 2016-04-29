@@ -322,6 +322,7 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
             let tel = &hashmap.get("tel").unwrap()[0];
             let code:&str = &hashmap.get("code").unwrap()[0];
             let vcode = format!("{}",login_status.code.unwrap());
+            warn!("code={},vcode={}",code,&vcode);
             if code == vcode {
                 let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
                 service.add_passenger(p.clone()).unwrap();
