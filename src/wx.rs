@@ -432,7 +432,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
         },
         Err(err) => {
                         warn!("{}",err);
-                        Ok(Response::with((status::Ok,"{success:false}")))
+                        Ok(Response::with((status::Ok,"{\"success\":false}")))
         }
     }
 }
