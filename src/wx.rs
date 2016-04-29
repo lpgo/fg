@@ -317,19 +317,18 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
     let mut success = false;
-    let mut to_owner = false;
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {       
             let tel = &hashmap.get("tel").unwrap()[0];
-            let code = &hashmap.get("code").unwrap()[0];
-            let owner = &hashmap.get("owner");
-            //to-do validate code 
-            let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
-            service.add_passenger(p.clone()).unwrap();
-            login_status.passenger = Some(p);
-            success = true;
-            if owner.is_some() {
-                to_owner = true;
+            let code:&str = &hashmap.get("code").unwrap()[0];
+            let vcode = format!("{}",login_status.code.unwrap());
+            if code == vcode {
+                let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
+                service.add_passenger(p.clone()).unwrap();
+                login_status.passenger = Some(p);
+                success = true;
+            } else {
+                success = false;
             }
         },
         Err(_) => {}
@@ -338,11 +337,7 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         login_status.user_type  = UserType::Passenger;
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
-        if to_owner {
-            Ok(Response::with((status::Ok,"{\"success\":true,redirect:\"/driverregister\"}")))
-        } else {
-            Ok(Response::with((status::Ok,"{\"success\":true,redirect:\"/\"}")))
-        }
+        Ok(Response::with((status::Ok,"{\"success\":true}")))
     } else  {
         Ok(Response::with((status::Ok,"{\"success\":false}")))
     }

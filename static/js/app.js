@@ -59,8 +59,9 @@ app.config(function($routeProvider){
   });
 });
 
-app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location',function($scope,$routeParams,$http,$location){
+app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$rootScope',function($scope,$routeParams,$http,$location,$rootScope){
     var oid = $routeParams.oid;
+    $rootScope.oid = oid;
     $scope.count =1;
     var getTripDetail = function(oid) {
       $http.post("/tripDetail",{oid:oid}).success(function(trip){
@@ -118,7 +119,7 @@ app.controller('MainCtrl', ['$scope','$http', function($scope,$http){
        $scope.getTrips();
 }]);
 
-app.controller('ConfirmationCtrl', ['$scope','$http','$location', function($scope,$http,$location){
+app.controller('ConfirmationCtrl', ['$scope','$http','$location','$rootScope', function($scope,$http,$location,$rootScope){
 
   $scope.tel = "";
   $scope.code = "";
@@ -134,7 +135,7 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location', function($scop
   $scope.registerPassenger = function() {
     $http.post("/registerPassenger",{tel:$scope.tel,code:$scope.code}).success(function(data){
       if(data.success) {
-        $location.url(data.redirect);
+        $location.url("/buysit/"+$rootScope.oid);
       } else {
         alert("registerPassenger error");
       }
