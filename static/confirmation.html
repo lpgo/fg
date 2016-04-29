@@ -2,14 +2,14 @@
 <div id="content">
     <div id="subtitle">为方便于车主联系,请验证手机</div>
     <div id="phone">
-        <input  type="text" maxlength="13" placeholder="手机号" ng-model="tel">
-        <button type="button" ng-click="getCode()">获取验证码</button>
+        <input  type="text" maxlength="13" placeholder="手机号" ng-model="tel" >
+        <button type="button" ng-click="getCode()" ng-disabled="getCodeBtn">获取验证码</button>
     </div>
     <div id="yanzhengma">
         <input type="text" placeholder="验证码" ng-model="code">
     </div>
     <div id="confirm">
-        <button type="button" ng-click="registerPassenger()">确定</button>
+        <button type="button" ng-click="registerPassenger()" ng-disabled="submitBtn">确定</button>
     </div>
     <div id="item">
         <span>点击-确定,既表示您同意</span>

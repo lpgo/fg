@@ -123,11 +123,16 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location','$rootScope', f
 
   $scope.tel = "";
   $scope.code = "";
+  $scope.submitBtn = true;
+  $scope.getCodeBtn = false;
 
   $scope.getCode = function() {
     $http.post("/getCode",{tel:$scope.tel}).success(function(data){
       if(!data.success) {
         alert("get code error");
+      } else {
+        $scope.getCodeBtn = true;
+        $scope.submitBtn = false; 
       }
     });
   };
