@@ -5,7 +5,7 @@
     <div id="gather">
         <p id="gathertime">
             <span id="gathertimemonthday">{{trip.start_time | date:'MM月dd日'}}</span>
-            <span id="gathertimehour">{{trip.start_time | date:'HH:mm'}}</span>
+            <span id="gathertimehour">{{trip.start_time}}---{{trip.start_time | date:'yyyy-MM-dd HH:mm:ss'}}</span>
         </p>
         <p id="gatherlocation">
             <span id="gatherlocation1">集合地点:</span>
