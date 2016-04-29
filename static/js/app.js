@@ -61,6 +61,7 @@ app.config(function($routeProvider){
 
 app.controller('BuySeatCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http){
 	var oid = $routeParams.oid;
+  $scope.count =1;
   var getTripDetail = function(oid) {
     $http.post("/tripDetail",{oid:oid}).success(function(trip){
       $scope.trip = trip;

@@ -4,30 +4,30 @@
 <div>
     <div id="gather">
         <p id="gathertime">
-            <span id="gathertimemonthday">10月16日</span>
-            <span id="gathertimehour">上午10:30</span>
+            <span id="gathertimemonthday">{{trip.start_time | date:'MM月dd日'}}</span>
+            <span id="gathertimehour">{{trip.start_time | date:'HH:mm'}}</span>
         </p>
         <p id="gatherlocation">
             <span id="gatherlocation1">集合地点:</span>
-            <span id="gatherlocation2">金信广场</span>
+            <span id="gatherlocation2">{{trip.venue}}</span>
         </p>
 
     </div>
     <div id="line">
         <div id="linestart">
             <i>icon</i>
-            <span id="linestartlocation">府谷</span>
+            <span id="linestartlocation">{{trip.start}}</span>
         </div>
         <div id="linemoney" class="ks-clear">
             <div class="fr">
-                <p ><span id="linemoneynum">30</span><span>元|位</span></p>
-                <p id="remainsit" >剩余2座位</p>
+                <p ><span id="linemoneynum">{{trip.price}}</span><span>元|位</span></p>
+                <p id="remainsit" >剩余{{trip.current_seat}}座位</p>
             </div>
 
         </div>
         <div id="lineend">
             <i>icon</i>
-            <span id="lineendlocation">榆林</span>
+            <span id="lineendlocation">{{trip.end}}</span>
         </div>
 
     </div>
@@ -47,8 +47,8 @@
 
     </div>
     <div id="lineinfo">
-        <p id="lineinfostnum">购座数量  <span>icon</span> <span>1</span> <span>icon</span></p>
-        <p id="total">合计&nbsp;:&nbsp;<span>60元</span></p>
+        <p id="lineinfostnum">购座数量  <span>icon</span> <span>{{count}}</span> <span>icon</span></p>
+        <p id="total">合计&nbsp;:&nbsp;<span>{{trip.price*count}}元</span></p>
     </div>
     <div id="linebutton">
         <button type="button">购&nbsp;座</button>
