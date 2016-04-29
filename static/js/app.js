@@ -59,7 +59,7 @@ app.config(function($routeProvider){
   });
 });
 
-app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location' function($scope,$routeParams,$http,$location){
+app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location',function($scope,$routeParams,$http,$location){
     var oid = $routeParams.oid;
     $scope.count =1;
     var getTripDetail = function(oid) {
