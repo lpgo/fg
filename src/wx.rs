@@ -274,17 +274,20 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
     }
 }
 
-pub fn trip_detail_template(req:&mut Request) -> IronResult<Response> {
+pub fn trip_detail(req:&mut Request) -> IronResult<Response> {
     match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
-        req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
+        req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
             let oid = &hashmap.get("oid").unwrap()[0];
             service.get_trip_by_oid(oid)
+        }).and_then(|trip|{
+            serde_json::to_string(&trip).map_err(|err|ServiceError::SerdeJsonError(err))
         })
     }) {
             Ok(trip) => {
-                let mut resp = Response::new();
-                res_template!("tripDetail",trip,resp)
-                //Ok(Response::with((status::Ok,format!("get trip detail has error : {:?}",trip))))
+                //let mut resp = Response::new();
+                //res_template!("tripDetail",trip,resp)
+                let res:&str = &trip;
+                Ok(Response::with((status::Ok,res)))
             },
             Err(err) => {
                 Ok(Response::with((status::Ok,format!("get trip detail has error : {}",err))))

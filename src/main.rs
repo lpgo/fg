@@ -59,10 +59,11 @@ fn main() {
     router.post("/payResult",wx::pay_result);
     router.get("/payResult",wx::pay_result);
     router.post("/getCode", wx::get_code);
+    router.post("/tripDetail",wx::trip_detail);
 
     //template
     router.get("/pinche/index.html",wx::index_template);
-    router.get("/pinche/tripDetail",wx::trip_detail_template);
+    //router.get("/pinche/tripDetail",wx::trip_detail_template);
     router.get("/pinche/myInfo", wx::my_info_template);
 
     router.get("/favicon.ico",wx::ico);

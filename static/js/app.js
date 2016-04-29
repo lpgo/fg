@@ -59,8 +59,14 @@ app.config(function($routeProvider){
   });
 });
 
-app.controller('BuySeatCtrl', ['$scope','$routeParams', function($scope,$routeParams){
-	
+app.controller('BuySeatCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http){
+	var oid = $routeParams.oid;
+  var getTripDetail = function(oid) {
+    $http.post("/tripDetail",{oid:oid}).success(function(trip){
+      $scope.trip = trip;
+    });
+  }
+  getTripDetail(oid);
 }]);
 
 app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
