@@ -339,12 +339,12 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
         let mut resp = Response::new();
         set_session::<LoginStatus>(req, &mut resp, login_status);
         if to_owner {
-            Ok(Response::with((status::Ok,"{success:true,redirect:\"/driverregister\"}")))
+            Ok(Response::with((status::Ok,"{\"success\":true,redirect:\"/driverregister\"}")))
         } else {
-            Ok(Response::with((status::Ok,"{success:true,redirect:\"/\"}")))
+            Ok(Response::with((status::Ok,"{\"success\":true,redirect:\"/\"}")))
         }
     } else  {
-        Ok(Response::with((status::Ok,"{success:false}")))
+        Ok(Response::with((status::Ok,"{\"success\":false}")))
     }
     
 }

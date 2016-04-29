@@ -132,7 +132,7 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location', function($scop
   };
 
   $scope.registerPassenger = function() {
-    $http.post("/registerPassenger",$scope).success(function(data){
+    $http.post("/registerPassenger",{tel:$scope.tel,code:$scope.code}).success(function(data){
       if(data.success) {
         $location.url(data.redirect);
       } else {
