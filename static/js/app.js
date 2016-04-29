@@ -91,7 +91,7 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http', function($scope,
   }
 
   $scope.applyTrip = function() {
-    $http.post("applyTrip",{oid:oid}).success(function(data){
+    $http.post("/applyTrip",{oid:oid}).success(function(data){
       pay(data);
     });
   }
