@@ -556,7 +556,7 @@ pub fn get_wx_user(token:&str,openid:&str) -> WxUserInfo {
 
 pub fn get_code(req: &mut Request) -> IronResult<Response> {
     let mut  res = Response::new();
-    match req.get_ref::<UrlEncodedQuery>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
+    match req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).map(|hashmap|{
         hashmap.get("tel").unwrap()[0].clone()
     }).and_then(|tel|{
         let mut rng = thread_rng();
@@ -571,11 +571,11 @@ pub fn get_code(req: &mut Request) -> IronResult<Response> {
         set_session::<LoginStatus>(req, &mut res, login_status);
     }) {
         Ok(_) => {
-            Ok(Response::with((status::Ok,"{success:true}")))
+            Ok(Response::with((status::Ok,"{\"success\":true}")))
         },
         Err(err) => {
             warn!("get code error is {}",err);
-            Ok(Response::with((status::Ok,"{success:false}")))
+            Ok(Response::with((status::Ok,"{\"success\":false}")))
         }
     }
 }

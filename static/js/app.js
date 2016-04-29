@@ -124,11 +124,10 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location', function($scop
   $scope.code = "";
 
   $scope.getCode = function() {
-    $http.post("/getCode",$scope).success(function(data){
+    $http.post("/getCode",{tel:$scope.tel}).success(function(data){
       if(!data.success) {
         alert("get code error");
       }
-
     });
   };
 
