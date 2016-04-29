@@ -59,15 +59,15 @@ app.config(function($routeProvider){
   });
 });
 
-app.controller('BuySeatCtrl', ['$scope','$routeParams','$http', function($scope,$routeParams,$http){
-	var oid = $routeParams.oid;
-  $scope.count =1;
-  var getTripDetail = function(oid) {
-    $http.post("/tripDetail",{oid:oid}).success(function(trip){
-      $scope.trip = trip;
-    });
-  }
-  getTripDetail(oid);
+app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location' function($scope,$routeParams,$http,$location){
+    var oid = $routeParams.oid;
+    $scope.count =1;
+    var getTripDetail = function(oid) {
+      $http.post("/tripDetail",{oid:oid}).success(function(trip){
+        $scope.trip = trip;
+      });
+    }
+    getTripDetail(oid);
 
   function pay(data) {
     WeixinJSBridge.invoke(
@@ -92,7 +92,11 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http', function($scope,
 
   $scope.applyTrip = function() {
     $http.post("/applyTrip",{oid:oid}).success(function(data){
-      pay(data);
+      if(data.success) {
+        pay(data);
+      } else {
+        $location.url("/confirmation");
+      }
     });
   }
 
