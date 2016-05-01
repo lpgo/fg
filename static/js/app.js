@@ -152,22 +152,19 @@ app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
 
 app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,$location){
 
-	$scope.data = (function() {
-    $http.post("/getTrips",null).success(function(data){
-      return data;
-    });
-  })();
+  $scope.data = [];
+  var userType = null;
 
-  var userType = (function() {
-    $http.post("/getUserInfo",null).success(function(data){
-      if(data.login) {
-        return data.userType;
-      } else {
-        return null;
-      }
-    });
-  })();
+  $http.post("/getTrips",null).success(function(data){
+    $scope.data = data;
+  });
 
+  $http.post("/getUserInfo",null).success(function(data){
+    if(data.login) {
+      userType = data.userType;
+    } 
+  });
+ 
   $scope.publishTrip = function() {
     if(userType == "Owner") {
       $location.url("/postline");
@@ -177,7 +174,6 @@ app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,
       $location.url("/driverregister/"+userType);
     }
   };
-
 
 }]);
 
