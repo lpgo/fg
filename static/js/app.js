@@ -239,7 +239,8 @@ app.controller('DriverRegisterCtrl', ['$scope','$location','$routeParams','$http
       if(!data.success) {
         alert("get code error");
       } else {
-        
+        $scope.submitBtn = false;
+        $scope.getCodeBtn = true;
       }
     });
   };
