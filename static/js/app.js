@@ -250,7 +250,7 @@ app.controller('DriverRegisterCtrl', ['$scope','$location','$routeParams', funct
         alert("auth code error");
       }
     });
-  }
+  };
 
 
 }]);
