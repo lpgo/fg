@@ -221,6 +221,11 @@ app.controller('PassengerTripCtrl', ['$scope','$location', function($scope,$loca
 
 app.controller('DriverRegisterCtrl', ['$scope','$location','$routeParams', function($scope,$location,$routeParams){
   
+  $scope.tel = "";
+  $scope.code = "";
+  $scope.carType = "1";
+  $scope.plateNumber = "";
+
   $scope.needAuth = false;
   $scope.submitBtn = true;
   $scope.getCodeBtn = false;
@@ -243,6 +248,7 @@ app.controller('DriverRegisterCtrl', ['$scope','$location','$routeParams', funct
   };
 
   $scope.becomeOwner = function() {
+    alert("become owner");
     $http.post("/registerOwner",{tel:$scope.tel,code:$scope.code,carType:$scope.carType,plateNumber:$scope.plateNumber}).success(function(data){
       if(data.success) {
         $location.url("/postline");
