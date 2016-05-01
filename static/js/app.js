@@ -85,7 +85,7 @@ app.config(function($routeProvider){
     templateUrl:"/static/passengermyline.html",
     controller:"PassengerTripCtrl"
   });
-  $routeProvider.when("/postline",{
+  $routeProvider.when("/postline/:plateNumber",{
     templateUrl:"/static/postline.html",
     controller:"PublishTripCtrl"
   });
@@ -154,6 +154,7 @@ app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,
 
   $scope.data = [];
   var userType = null;
+  var plateNumber = null;
 
   $http.post("/getTrips",null).success(function(data){
     $scope.data = data;
@@ -162,12 +163,13 @@ app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,
   $http.post("/getUserInfo",null).success(function(data){
     if(data.login) {
       userType = data.userType;
+      plateNumber = data.plateNumber || null;
     } 
   });
  
   $scope.publishTrip = function() {
     if(userType == "Owner") {
-      $location.url("/postline");
+      $location.url("/postline/"+plateNumber);
     } else if (userType == null) {
       window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxe9a0a490a170731d&redirect_uri=http%3A%2F%2Fgeekgogo.cn%2Fpinche%2Findex.html&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
     } else {
@@ -270,7 +272,15 @@ app.controller('MyCarCtrl', ['$scope','$location', function($scope,$location){
 
 }]);
 
-app.controller('PublishTripCtrl', ['$scope','$location', function($scope,$location){
+app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams', function($scope,$location,$http,$routeParams){
+  $scope.plateNumber = $routeParams.plateNumber;
+  $scope.lineId = 1;
+
+  $scope.publishTrip = function() {
+    $http.post('/publishTrip',{lineId:$scope.lineId,startTime:$scope.startTime,seatCount:$scope.seatCount,venue:$scope.venue}).success(function(data){
+
+    });
+  };
 
 }]);
 

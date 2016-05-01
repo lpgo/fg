@@ -23,15 +23,15 @@
     </div>
     <div class="item">
         <i class="icon iconfont" >&#xe706;</i>
-        <input style="width: 83%" type="datetime-local" placeholder="时间" >
+        <input style="width: 83%" type="datetime-local" placeholder="时间" ng-model="startTime">
     </div>
     <div class="item">
         <i class="icon iconfont">&#xe614;</i>
-        <input type="text" placeholder="剩余座位">
+        <input type="text" placeholder="剩余座位" ng-model="seatCount">
     </div>
     <div class="item">
         <i class="icon iconfont">&#xe650;</i>
-        <input type="text" placeholder="集合地点">
+        <input type="text" placeholder="集合地点" ng-model="venue">
     </div>
 </div>
 <div id="footer">
@@ -41,7 +41,7 @@
             <span >车辆号牌</span>
         </div>
         <div class="rightitemtext">
-            <span id="chepai">陕KZJ987</span>
+            <span id="chepai" ng-model="plateNumber">陕KZJ987</span>
             <a  href="">&nbsp修改</a>
         </div>
 
@@ -53,7 +53,7 @@
     </div>
 </div>
 <div id="button">
-    <button type="button">确认发布</button>
+    <button type="button" ng-click="publishTrip()">确认发布</button>
 </div>
 <br>
 <br>

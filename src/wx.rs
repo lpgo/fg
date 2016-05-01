@@ -228,8 +228,21 @@ pub fn register_owner(req:&mut Request) -> IronResult<Response> {
 pub fn get_user_info(req:&mut Request) -> IronResult<Response> {
     match get_session::<LoginStatus>(req) {
         Some(login_status) => {
-            let replay:&str = &format!("{{\"login\":true,\"userType\":\"{}\"}}",login_status.user_type);
-            Ok(Response::with((status::Ok,replay)))
+            let replay:String;
+            match login_status.user_type {
+                UserType::Anonymous => {
+                    replay = format!("{{\"login\":true,\"userType\":\"{}\"}}",login_status.user_type);
+                },
+                UserType::Passenger => {
+                    replay = format!("{{\"login\":true,\"userType\":\"{}\"}}",login_status.user_type);
+                },
+                UserType::Owner => {
+                    let owner = login_status.owner.unwrap();
+                    replay = format!("{{\"login\":true,\"userType\":\"{}\",\"plateNumber\":\"{}\"}}",login_status.user_type,owner.plate_number);
+                }
+            };
+            let res:&str = &replay;
+            Ok(Response::with((status::Ok,res)))
         },
         None => {
             Ok(Response::with((status::Ok,"{\"login\":false}")))
@@ -263,7 +276,8 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
     }
 
     if !can {
-        return  Ok(Response::with((status::Ok,"you are not a owner ,can't publish Trip !")));
+        warn!("you are not owner,can't publish trip");
+        return Ok(Response::with((status::Ok,"{\"success\":false}")));
     }
 
     let service = req.get::<PersistRead<Service>>().unwrap();
@@ -296,20 +310,23 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.status = TripStatus::Prepare.to_string();
                                 t.venue = venue.clone();
                                 service.add_trip(t);
-                                return Ok(Response::with((status::Ok,"publish Trip sucess!")));
+                                return Ok(Response::with((status::Ok,"{\"success\":false}")));
                             },
                             Err(err) => {
                                 warn!("get line has a err :{}",err);
-                                return Ok(Response::with((status::Ok,"err line id")));
+                                return Ok(Response::with((status::Ok,"{\"success\":false}")));
                             }
                         }
                     }
                 }
             }
-
-            return Ok(Response::with((status::Ok,"error parameters!")));
+            warn!("parameter error!");
+            return Ok(Response::with((status::Ok,"{\"success\":false}")));
         },
-        Err(_) => Ok(Response::with((status::Ok,"error parameters!")))
+        Err(_) => {
+            warn!("parameter error!");
+            return Ok(Response::with((status::Ok,"{\"success\":false}")));
+        }
     }
 }
 
