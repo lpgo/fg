@@ -6,6 +6,7 @@ use serde::{de,Deserialize, Serialize, Deserializer};
 use bson::{Bson, Encoder, Decoder, DecoderError,Document};
 use serde_json::value::{self, Value};
 use std::collections::BTreeMap;
+use std::fmt;
 use chrono;
 use iron::typemap::Key;
 

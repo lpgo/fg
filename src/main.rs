@@ -60,6 +60,7 @@ fn main() {
     router.get("/payResult",wx::pay_result);
     router.post("/getCode", wx::get_code);
     router.post("/tripDetail",wx::trip_detail);
+    router.post("/getUserInfo",wx::get_user_info);
 
     //template
     router.get("/pinche/index.html",wx::index_template);

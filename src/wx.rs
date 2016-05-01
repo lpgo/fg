@@ -83,77 +83,77 @@ struct Message  {
 */
 impl WxInstance {
 	pub fn new() -> Self {
-                let appid = ConfigManager::get_config_str("app","appid");
-                let secret = ConfigManager::get_config_str("app","appsecret");
-                let token = ConfigManager::get_config_str("app","token");
-	   let mut instance =  WxInstance{appid:appid,secret:secret,token:token,access_token:String::new(),access_token_expires:0u32,openid:String::new()};
-                instance.get_access_token();
-                instance
+        let appid = ConfigManager::get_config_str("app","appid");
+        let secret = ConfigManager::get_config_str("app","appsecret");
+        let token = ConfigManager::get_config_str("app","token");
+        let mut instance =  WxInstance{appid:appid,secret:secret,token:token,access_token:String::new(),access_token_expires:0u32,openid:String::new()};
+        instance.get_access_token();
+        instance
 	}
 
 	pub fn check(&self,timestamp:&str, nonce:&str, echostr:&str, signature:&str) -> Result<String> {
-                	let mut strs:Vec<&str> = vec![&self.token,nonce,timestamp];
-                	println!("strs is {:?}", strs);
-                	quickersort::sort(&mut strs[..]);
-                	let ss = strs.join("");
-                	let mut m = sha1::Sha1::new();
-                	m.reset();
-                        m.update(ss.as_bytes());
-                        let hh = m.hexdigest();
-                        println!("sha1 result is {}", hh);
-                        if &hh == signature {
-                        	Ok(echostr.to_string())
-                        } else {
-                        	Err(ServiceError::Other("check error!".to_string()))
-                        }
+    	let mut strs:Vec<&str> = vec![&self.token,nonce,timestamp];
+    	println!("strs is {:?}", strs);
+    	quickersort::sort(&mut strs[..]);
+    	let ss = strs.join("");
+    	let mut m = sha1::Sha1::new();
+    	m.reset();
+        m.update(ss.as_bytes());
+        let hh = m.hexdigest();
+        println!("sha1 result is {}", hh);
+        if &hh == signature {
+        	Ok(echostr.to_string())
+        } else {
+        	Err(ServiceError::Other("check error!".to_string()))
+        }
 	}
 
-            pub fn get_access_token(& mut self){
-                let client = pay::ssl_client();
-                let url = format!("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}",self.appid,self.secret);
-                client.get(&url).send().and_then(|mut res|{
-                    let mut buf = String::new();
-                    res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
-                }).and_then(|buf|{
-                    serde_json::from_str::<ApiResult>(&buf).map_err(|err| hyper::Error::Method)
-                }).ok().and_then(|res|{  
-                       if let Some(token) = res.access_token {
-                            self.access_token = token;
-                            let expires = res.expires_in.unwrap_or(7200u32);
-                            self.access_token_expires = expires;
-                            Some(expires)
-                       } else {
-                             warn!("get access token error!!");
-                             None
-                       }
-                });
-            }
+    pub fn get_access_token(& mut self){
+        let client = pay::ssl_client();
+        let url = format!("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}",self.appid,self.secret);
+        client.get(&url).send().and_then(|mut res|{
+            let mut buf = String::new();
+            res.read_to_string(& mut buf).map(|_| buf).map_err(|err|hyper::Error::Io(err))
+        }).and_then(|buf|{
+            serde_json::from_str::<ApiResult>(&buf).map_err(|err| hyper::Error::Method)
+        }).ok().and_then(|res|{  
+               if let Some(token) = res.access_token {
+                    self.access_token = token;
+                    let expires = res.expires_in.unwrap_or(7200u32);
+                    self.access_token_expires = expires;
+                    Some(expires)
+               } else {
+                     warn!("get access token error!!");
+                     None
+               }
+        });
+    }
 
-           
-            pub fn get_user_list(&self){
-                let client = pay::ssl_client();
-                let url = format!("https://api.weixin.qq.com/cgi-bin/user/get?access_token={}",self.access_token);
-                warn!("url is {}",url);
-                client.get(&url).send().and_then(|mut res|{
-                    let mut buf = String::new();
-                    res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
-                }).and_then(|buf|{
-                    warn!("userList is {}",buf);
-                    Ok(buf)
-                });
-            }
+   
+    pub fn get_user_list(&self){
+        let client = pay::ssl_client();
+        let url = format!("https://api.weixin.qq.com/cgi-bin/user/get?access_token={}",self.access_token);
+        warn!("url is {}",url);
+        client.get(&url).send().and_then(|mut res|{
+            let mut buf = String::new();
+            res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+        }).and_then(|buf|{
+            warn!("userList is {}",buf);
+            Ok(buf)
+        });
+    }
 
-            pub fn get_user_info(&self,openid:&str){
-                let client = pay::ssl_client();
-                let url = format!("https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}&lang=zh_CN",self.access_token,openid);
-                client.get(&url).send().and_then(|mut res|{
-                    let mut buf = String::new();
-                    res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
-                }).and_then(|buf|{
-                    warn!("{} 's info is {}",openid,buf);
-                    Ok(buf)
-                });
-            }
+    pub fn get_user_info(&self,openid:&str){
+        let client = pay::ssl_client();
+        let url = format!("https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}&lang=zh_CN",self.access_token,openid);
+        client.get(&url).send().and_then(|mut res|{
+            let mut buf = String::new();
+            res.read_to_string(& mut buf).map(move |_| buf).map_err(|err|hyper::Error::Io(err))
+        }).and_then(|buf|{
+            warn!("{} 's info is {}",openid,buf);
+            Ok(buf)
+        });
+    }
 
 }
 
@@ -179,25 +179,64 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
 }
 
 pub fn register_owner(req:&mut Request) -> IronResult<Response> {
-        let service = req.get::<PersistRead<Service>>().unwrap();
-        let mut login_status = get_session::<LoginStatus>(req).unwrap();
-        req.get_ref::<UrlEncodedBody>().and_then(|hashmap|{
-            let plate_number = &hashmap.get("plate_number").unwrap()[0];
-            let car_type = &hashmap.get("car_type").unwrap()[0];
-            let openid = login_status.openid.clone();
-            let p = login_status.passenger.as_ref().unwrap();
-            let owner = Owner::new(p.tel.clone(),car_type.clone(),plate_number.clone(),openid);
-            service.add_owner(owner.clone());
-            login_status.owner = Some(owner);
-            login_status.user_type = UserType::Owner;
-            Ok(())
-        });
+    let service = req.get::<PersistRead<Service>>().unwrap();
+    let mut login_status = get_session::<LoginStatus>(req).unwrap();
+    match req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
+        let plate_number = &hashmap.get("plateNumber").unwrap()[0];
+        let car_type = &hashmap.get("carType").unwrap()[0];
+        let openid = login_status.openid.clone();
 
-        let mut resp = Response::new();
-        let ls = login_status.clone();
-        set_session::<LoginStatus>(req, &mut resp, login_status);
-        res_template!("publishTrip",ls.owner.unwrap(),resp)
+        match login_status.user_type {
+            UserType::Anonymous => {
+                let tel = &hashmap.get("tel").unwrap()[0];
+                let code:&str = &hashmap.get("code").unwrap()[0];
+                let vcode = format!("{}",login_status.code.unwrap());
+                if code == vcode {
+                    let owner = Owner::new(tel.clone(),car_type.clone(),plate_number.clone(),openid);
+                    service.add_owner(owner.clone());
+                    login_status.owner = Some(owner);
+                    login_status.user_type = UserType::Owner;
+                    Ok(())
+                } else {
+                    Err(ServiceError::Other("Verify Code Error!".to_string()))
+                }
+            },
+            UserType::Passenger => {
+                let p = login_status.passenger.as_ref().unwrap();
+                let owner = Owner::new(p.tel.clone(),car_type.clone(),plate_number.clone(),openid);
+                service.add_owner(owner.clone());
+                login_status.owner = Some(owner);
+                login_status.user_type = UserType::Owner;
+                Ok(())
+            },
+            UserType::Owner => {Ok(())}
+        }
+    }) {
+        Ok(_) => {
+            let mut resp = Response::with((status::Ok,"{\"success\":true}"));
+            let ls = login_status.clone();
+            set_session::<LoginStatus>(req, &mut resp, login_status);
+            Ok(resp)
+        },
+        Err(err) => {
+            Ok(Response::with((status::Ok,"{\"success\":false}")))
+        }
+    }
+
 }
+
+pub fn get_user_info(req:&mut Request) -> IronResult<Response> {
+    match get_session::<LoginStatus>(req) {
+        Some(login_status) => {
+            let replay:&str = &format!("{{\"login\":true,\"userType\":\"{}\"}}",login_status.user_type);
+            Ok(Response::with((status::Ok,replay)))
+        },
+        None => {
+            Ok(Response::with((status::Ok,"{\"login\":false}")))
+        }
+    }
+} 
+
 
 pub fn can_publish_trip(req:&mut Request) -> IronResult<Response> {
     get_session::<LoginStatus>(req).ok_or(IronError::new(HttpError::Method,"can not get session")).and_then(|ls|{
@@ -283,15 +322,15 @@ pub fn trip_detail(req:&mut Request) -> IronResult<Response> {
             serde_json::to_string(&trip).map_err(|err|ServiceError::SerdeJsonError(err))
         })
     }) {
-            Ok(trip) => {
-                //let mut resp = Response::new();
-                //res_template!("tripDetail",trip,resp)
-                let res:&str = &trip;
-                Ok(Response::with((status::Ok,res)))
-            },
-            Err(err) => {
-                Ok(Response::with((status::Ok,format!("get trip detail has error : {}",err))))
-            }
+        Ok(trip) => {
+            //let mut resp = Response::new();
+            //res_template!("tripDetail",trip,resp)
+            let res:&str = &trip;
+            Ok(Response::with((status::Ok,res)))
+        },
+        Err(err) => {
+            Ok(Response::with((status::Ok,format!("get trip detail has error : {}",err))))
+        }
     }
 }
 
@@ -322,7 +361,6 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
             let tel = &hashmap.get("tel").unwrap()[0];
             let code:&str = &hashmap.get("code").unwrap()[0];
             let vcode = format!("{}",login_status.code.unwrap());
-            warn!("code={},vcode={}",code,&vcode);
             if code == vcode {
                 let mut p = Passenger::new(tel.to_owned(),login_status.openid.clone());
                 service.add_passenger(p.clone()).unwrap();
@@ -360,47 +398,6 @@ pub fn get_trips(req:&mut Request) -> IronResult<Response> {
     }
 }
 
-/*
-pub fn login(req:&mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
-    let mut openid = String::new();
-    if let Ok(ref hashmap) = req.get_ref::<UrlEncodedBody>() {
-        openid = hashmap.get("openid").unwrap()[0].to_owned();            
-    }
-    if openid.is_empty() {
-        let s = r#"{"success":false,"msg":"parameters errror"}"#;
-        Ok(Response::with((status::Ok,s)))
-    } else {
-        match service.get_user_by_id(&openid) {
-            (Some(o),None) => {
-                let s = r#"{"success":true,"type":"owner"}"#;
-                let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{openid:o.openid,user_type:UserType::Owner,name:o.name};
-                set_session::<LoginStatus>(req, &mut res, login_status);
-                Ok(res)
-            },
-            (None,Some(p)) => {
-                let s = r#"{"success":true,"type":"passenger"}"#;
-                let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{openid:p.openid,user_type:UserType::Passenger,name:p.name};
-                set_session::<LoginStatus>(req, &mut res, login_status);
-                Ok(res)
-            },
-            (Some(o),Some(p)) => {
-                let s = r#"{"success":true,"type":"owner"}"#;
-                let mut res = Response::with((status::Ok,s));
-                let login_status = LoginStatus{openid:o.openid,user_type:UserType::Owner,name:o.name};
-                set_session::<LoginStatus>(req, &mut res, login_status);
-                Ok(res)
-            },
-            (None,None) => {
-                let s = r#"{"success":false,"msg":"login faile!!!"}"#;
-                Ok(Response::with((status::Ok,s)))
-            }
-        }
-    }
-}
-*/
 pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
     let replay = get_session::<LoginStatus>(req).and_then(|login_status|{
