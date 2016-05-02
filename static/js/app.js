@@ -140,9 +140,9 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
            "paySign":data.paySign //微信签名 
        },
        function(res){     
-           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+           if(res.err_msg == "get_brand_wcpay_request：ok" ) {
                 $location.url("/buysitsuccess");
-           } else if(res.err_msg == "get_brand_wcpay_request:fail" ) {
+           } else if(res.err_msg == "get_brand_wcpay_request：fail" ) {
                 alert("支付失败，请重试！");
            }   
        }

@@ -257,7 +257,7 @@ pub fn check_pay_result(result:&PayResult) -> bool {
 	let total_fee = format!("{}",result.total_fee);
 	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
 	strs.insert("appid",&appid);
-	strs.insert("mchid",&mchid);
+	strs.insert("mch_id",&mchid);
 	strs.insert("nonce_str",&result.nonce_str);
 	strs.insert("is_subscribe",&result.is_subscribe);
 	strs.insert("openid",&result.openid);
