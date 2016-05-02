@@ -147,8 +147,9 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
           },
           function(res){     
              if(res.err_msg == "get_brand_wcpay_request:ok") {
-                  $location.url("/buysitsuccess");
-                  window.location.href="index.html#/buysitsuccess";
+                  $scope.$apply($location.url("/buysitsuccess"));
+                  alert("ok");
+                  //window.location.href="index.html#/buysitsuccess";
              } else if(res.err_msg == "get_brand_wcpay_request:fail") {
                   alert("支付失败，请重试！");
              }   
@@ -228,7 +229,9 @@ app.controller('ConfirmationCtrl', ['$scope','$http','$location','$rootScope', f
 }]);
 
 app.controller('BuySuccessCtrl', ['$scope','$location', function($scope,$location){
-
+  $scope.myTrip = function() {
+    $location.url("/passengermyline");
+  }
 }]);
 
 app.controller('DriverTripCtrl', ['$scope','$location', function($scope,$location){

@@ -160,6 +160,14 @@ impl Service {
 		})
 	}
 
+	pub fn get_passenger_trips(&self,openid:&str) -> Result<String> {
+		self.0.get_by_openid::<Order>(openid).and_then(|order|{
+			self.get_trip_by_oid(&order.trip_id)
+		}).and_then(|trip|{
+			serde_json::to_string(&trip).map_err(|err|ServiceError::SerdeJsonError(err))
+		})
+	}
+
 	//todo
 	pub fn apply_trip(&self,oid:&str,openid:&str) -> Result<String> {
 		let order_id = Uuid::new_v4().to_simple_string();
