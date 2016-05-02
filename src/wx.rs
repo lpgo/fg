@@ -309,6 +309,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.current_seat = seat;
                                 t.status = TripStatus::Prepare.to_string();
                                 t.venue = venue.clone();
+                                t.plate_number = login_status.owner.unwrap().plate_number;
                                 service.add_trip(t);
                                 return Ok(Response::with((status::Ok,"{\"success\":true}")));
                             },
