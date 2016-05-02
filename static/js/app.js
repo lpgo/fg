@@ -129,31 +129,31 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
   getTripDetail(oid);
 
   function pay(data) {
-    WeixinJSBridge.invoke(
-       'getBrandWCPayRequest', 
-       {
-          "appId" :data.appId,     
-           "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
-           "nonceStr":data.nonceStr, //随机串     
-           "package":data.package,     
-           "signType":"MD5",         //微信签名方式：     
-           "paySign":data.paySign //微信签名 
-       },
-       function(res){     
-           if(res.err_msg == "get_brand_wcpay_request:ok") {
-                $location.url("/buysitsuccess");
-                alert("ok");
-           } else if(res.err_msg == "get_brand_wcpay_request:fail") {
-                alert("支付失败，请重试！");
-           }   
-       }
-    ); 
+    
   }
 
   $scope.applyTrip = function() {
     $http.post("/applyTrip",{oid:oid}).success(function(data){
       if(data.success) {
-        pay(data);
+        WeixinJSBridge.invoke(
+          'getBrandWCPayRequest', 
+          {
+              "appId" :data.appId,     
+               "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
+               "nonceStr":data.nonceStr, //随机串     
+               "package":data.package,     
+               "signType":"MD5",         //微信签名方式：     
+               "paySign":data.paySign //微信签名 
+          },
+          function(res){     
+             if(res.err_msg == "get_brand_wcpay_request:ok") {
+                  $location.url("/buysitsuccess");
+                  alert("ok");
+             } else if(res.err_msg == "get_brand_wcpay_request:fail") {
+                  alert("支付失败，请重试！");
+             }   
+          }
+        ); 
       } else {
         $location.url("/confirmation");
       }
