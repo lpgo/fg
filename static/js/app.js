@@ -1,4 +1,21 @@
 var app = angular.module('app',['ngRoute'],function($httpProvider) {
+
+  Date.prototype.Format = function (fmt) { //author: meizz 
+    var o = {
+        "M+": this.getMonth() + 1, //月份 
+        "d+": this.getDate(), //日 
+        "H+": this.getHours(), //小时 
+        "m+": this.getMinutes(), //分 
+        "s+": this.getSeconds(), //秒 
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+        "S": this.getMilliseconds() //毫秒 
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
+
   // Use x-www-form-urlencoded Content-Type
   $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
  
@@ -274,11 +291,11 @@ app.controller('MyCarCtrl', ['$scope','$location', function($scope,$location){
 
 app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams', function($scope,$location,$http,$routeParams){
   $scope.plateNumber = $routeParams.plateNumber;
-  $scope.lineId = "1";
+  $scope.lineId = 1;
 
   $scope.publishTrip = function() {
     var data = {lineId:$scope.lineId,startTime:$scope.startTime,seatCount:$scope.seatCount,venue:$scope.venue};
-    alert($scope.startTime.toString());
+    alert($scope.startTime.Format("yyyy-MM-ddTHH:mm:ss"));
     $http.post('/publishTrip',data).success(function(data){
       if(data.success) {
         $location.url("/drivermyline");
