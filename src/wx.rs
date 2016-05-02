@@ -354,7 +354,7 @@ pub fn trip_detail(req:&mut Request) -> IronResult<Response> {
 
 pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
     let mut buf = String::new();
-    req.body.read_to_string(& mut buf).map_err(|err|ServiceError::IoError(err)).and_then(|_|{
+    if let Err(err) = req.body.read_to_string(& mut buf).map_err(|err|ServiceError::IoError(err)).and_then(|_|{
         service::de_xml::<PayResult>(&buf)
     }).and_then(|result|{
         if service::check_pay_result(&result) {
@@ -366,7 +366,9 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
         req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).map(|service|{
             service.pay_success(&result);
         })
-    });
+    }) {
+        warn!("pay result error : {}",err);
+    }
         
     let result = r#"<xml>
       <return_code><![CDATA[SUCCESS]]></return_code>
