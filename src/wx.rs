@@ -9,8 +9,8 @@ use iron::{status,Url};
 use iron::modifiers::Redirect;
 use iron::error::HttpError;
 use db::Dao;
-use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo,TripStatus};
-use service::{Service,ServiceError};
+use model::{self,Passenger,Owner,Trip,ApiResult,LoginStatus,UserType,WxUserInfo,TripStatus,PayResult};
+use service::{self,Service,ServiceError};
 use mongodb::db::ThreadedDatabase;
 use session::{Session,SessionContext};
 use hbs::Template;
@@ -298,7 +298,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                         let line = service.get_line_by_id(id);
                         match line {
                             Ok(line) => {
-                                t.owner_id = login_status.openid.clone();
+                                t.openid = login_status.openid.clone();
                                 t.line_id = id;
                                 t.start = line.start;
                                 t.end = line.end;
@@ -353,20 +353,25 @@ pub fn trip_detail(req:&mut Request) -> IronResult<Response> {
 
 pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
     let mut buf = String::new();
-    match req.body.read_to_string(& mut buf) {
-        Ok(_) => {
-            warn!("pay_result is {}",buf);
-            let result = r#"<xml>
-              <return_code><![CDATA[SUCCESS]]></return_code>
-              <return_msg><![CDATA[OK]]></return_msg>
-            </xml>"#;
-            Ok(Response::with((status::Ok,result)))
-        },
-        Err(err) => {
-            warn!("pay_result error is {}",err);
-            Ok(Response::with(status::Ok))
+    req.body.read_to_string(& mut buf).map_err(|err|ServiceError::IoError(err)).and_then(|_|{
+        service::de_xml::<PayResult>(&buf)
+    }).and_then(|result|{
+        if service::check_pay_result(&result) {
+            Ok(result)
+        } else {
+            Err(ServiceError::Other("Verify sign error!".to_string()))
         }
-    }
+    }).and_then(|result|{
+        req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).map(|service|{
+            service.pay_success(&result);
+        })
+    });
+        
+    let result = r#"<xml>
+      <return_code><![CDATA[SUCCESS]]></return_code>
+      <return_msg><![CDATA[OK]]></return_msg>
+    </xml>"#;
+    Ok(Response::with((status::Ok,result))) 
 }
 
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {

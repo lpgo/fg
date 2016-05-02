@@ -30,9 +30,9 @@ impl ToDoc for model::Owner {
 	}
 }
 
-impl ToDoc for model::Seat {
+impl ToDoc for model::Order {
 	fn get_name() -> &'static str {
-		"Seat"
+		"Order"
 	}
 }
 
@@ -61,7 +61,7 @@ impl Dao {
        coll.insert_one(service::en_bson(t).unwrap(),None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err)) 
     }
 
-    pub fn get_by_openid<T>(&self,openid:&String) -> Result<T> where T:ToDoc+Deserialize{
+    pub fn get_by_openid<T>(&self,openid:&str) -> Result<T> where T:ToDoc+Deserialize{
         let coll = self.0.collection(T::get_name());
         let mut doc = Document::new();
         doc.insert("openid",openid.clone());
@@ -133,6 +133,46 @@ impl Dao {
             }).collect()
         }).unwrap()
     }
+
+    pub fn update_order(&self,order_id:&str,status:model::OrderStatus) -> Result<()> {
+        let coll = self.0.collection("Order");
+        let mut doc = Document::new();
+        let mut update_doc = Document::new();
+        let st:&str = &format!("{}",status);
+        update_doc.insert("$set",doc!{"status" => st});
+        doc.insert("order_id",order_id);
+        coll.update_one(doc,update_doc,None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err))
+    }
+
+    pub fn set_current_seats(&self,id:&str,seats:u32) -> Result<()> {
+        let coll = self.0.collection("Trip");
+        let mut doc = Document::new();
+        let mut update_doc = Document::new();
+        update_doc.insert("$set",doc!{"current_seat" => seats});
+        oid::ObjectId::with_string(id).map_err(|err|service::ServiceError::BsonOidError(err)).map(|o|Bson::ObjectId(o)).and_then(|oid|{
+            doc.insert("_id",oid);
+            coll.update_one(doc,update_doc,None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err))
+        })
+    }
+
+    pub fn get_orders_by_trip_id(&self,trip_id:&str) -> Vec<model::Order> {
+        let coll = self.0.collection(model::Order::get_name());
+        let mut doc = Document::new();
+        doc.insert("trip_id",trip_id);
+        match coll.find(Some(doc),None).map(|cursor|{
+            cursor.map(|result| {
+                result.map_err(|err|service::ServiceError::MongodbError(err)).and_then(|res|{
+                    service::de_bson::<model::Order>(res)
+                }).unwrap()
+            }).collect()
+        }) {
+            Ok(result) => result,
+            Err(err) => {
+                warn!("get order by trip error : {}",err);
+                Vec::new()
+            }
+        }
+    }
    
     //db.Trip.update({"owner_id":"openid"},{"$set":{"status":"Finish"}})
     pub fn update_status(&self) -> Result<()> {
@@ -143,7 +183,7 @@ impl Dao {
         let mut update_doc = Document::new();
         update_doc.insert("$set",doc!{"status" => "Running"});
         doc.insert("start_time",doc!{"$lte" => now});
-       coll.update_many(doc,update_doc,None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err))
+        coll.update_many(doc,update_doc,None).map(|_|()).map_err(|err|service::ServiceError::MongodbError(err))
     }
     
 }

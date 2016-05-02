@@ -78,28 +78,28 @@ impl PrePay {
     	let api_key = ConfigManager::get_config_str("app", "apikey");
     	let fee = format!("{}",self.total_fee);
     	let mut strs:BTreeMap<&str,&str> = BTreeMap::new();
-	strs.insert("appid",&self.appid);
-	strs.insert("body",&self.body);
-	strs.insert("attach", &self.attach);
-	strs.insert("mch_id",&self.mch_id);
-	strs.insert("nonce_str",&self.nonce_str);
-	strs.insert("notify_url",&self.notify_url);
-	strs.insert("openid",&self.openid);
-	strs.insert("out_trade_no",&self.out_trade_no);
-	strs.insert("spbill_create_ip","192.168.1.1");
-	strs.insert("total_fee",&fee);
-	strs.insert("trade_type","JSAPI");
-	let mut ss = String::new();
-	for (k,v) in strs {
-		ss.push_str(k);
-		ss.push('=');
-		ss.push_str(v);
-		ss.push('&');
-	}
-	ss.push_str("key=");
-	ss.push_str(&api_key);
-	warn!("ss is {}",&ss);
-	let sign = to_md5(&ss);
+		strs.insert("appid",&self.appid);
+		strs.insert("body",&self.body);
+		strs.insert("attach", &self.attach);
+		strs.insert("mch_id",&self.mch_id);
+		strs.insert("nonce_str",&self.nonce_str);
+		strs.insert("notify_url",&self.notify_url);
+		strs.insert("openid",&self.openid);
+		strs.insert("out_trade_no",&self.out_trade_no);
+		strs.insert("spbill_create_ip","192.168.1.1");
+		strs.insert("total_fee",&fee);
+		strs.insert("trade_type","JSAPI");
+		let mut ss = String::new();
+		for (k,v) in strs {
+			ss.push_str(k);
+			ss.push('=');
+			ss.push_str(v);
+			ss.push('&');
+		}
+		ss.push_str("key=");
+		ss.push_str(&api_key);
+		warn!("ss is {}",&ss);
+		let sign = to_md5(&ss);
 
     	format!(r#"
 		    		<xml>
@@ -292,14 +292,18 @@ pub fn send_sms(tel:&str,code:u32) {
     });
 }
 
+pub fn refund() {
+	
+}
+
 pub fn to_md5(s:&str) -> String {
 	let mut context = md5::Context::new();
-            context.consume(s.as_bytes());
-            let mut digest = String::with_capacity(2 * 16);
-            for x in &context.compute()[..] {
-                digest.push_str(&format!("{:02x}", x));
-            }
-            digest.to_uppercase()
+    context.consume(s.as_bytes());
+    let mut digest = String::with_capacity(2 * 16);
+    for x in &context.compute()[..] {
+        digest.push_str(&format!("{:02x}", x));
+    }
+    digest.to_uppercase()
 }
 
 

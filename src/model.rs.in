@@ -16,17 +16,22 @@ pub struct Passenger {
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
-pub struct Seat {
-    //_id: Option<Bson>,
-    passenger_id: Option<String>,
-    pay_id: Option<String>,
-    submit : bool
+pub struct Order {
+    _id: Option<Bson>,
+    pub openid: String,
+    pub trip_id: String,
+    pub order_id: String,
+    pub transaction_id: String,
+    pub tel: Option<String>,
+    pub status: String,
+    pub price: u32,
+    pub count:u32
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize,Default)]
 pub struct Trip {
-    _id:Option<Bson>,
-    pub owner_id: String,
+    pub _id:Option<Bson>,
+    pub openid: String,
     pub seat_count : u32,
     pub current_seat : u32,
     pub start_time : i64,
@@ -37,7 +42,8 @@ pub struct Trip {
     pub price:String,
     pub venue:String,
     pub status:String,
-    pub message:Option<String>
+    pub message:Option<String>,
+    pub plate_number: String
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -73,6 +79,27 @@ pub struct PrePayResult {
     pub prepay_id:String,
     code_url:Option<String>
 }
+
+#[derive(PartialEq, Debug, Serialize, Deserialize)]
+pub struct PayResult {
+    pub appid: String,
+    pub attach: String,
+    pub bank_type: String,
+    pub cash_fee: u32,
+    pub fee_type: String,
+    pub is_subscribe: String,
+    pub mch_id: String,
+    pub nonce_str: String,
+    pub openid: String,
+    pub out_trade_no: String,
+    pub result_code: String,
+    pub return_code: String,
+    pub sign: String,
+    pub time_end: String,
+    pub total_fee: u32,
+    pub trade_type: String,
+    pub transaction_id: String
+}
 //weixin api result
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
 pub struct ApiResult {
@@ -106,6 +133,15 @@ pub enum UserType {
     Anonymous
 }
 
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
+pub enum OrderStatus {
+    PaySuccess,
+    PayFail,
+    Submit,
+    Refund,
+    Request     //request refund
+}
+
 impl Default for UserType {
     // add code here
     fn default() -> UserType {
@@ -119,6 +155,18 @@ impl fmt::Display for UserType {
             UserType::Owner => write!(f, "Owner"),
             UserType::Passenger => write!(f, "Passenger"),
             UserType::Anonymous => write!(f, "Anonymous")
+        }
+    }
+}
+
+impl fmt::Display for OrderStatus {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            OrderStatus::PaySuccess => write!(f, "PaySuccess"),
+            OrderStatus::PayFail => write!(f, "PayFail"),
+            OrderStatus::Submit => write!(f, "Submit"),
+            OrderStatus::Request => write!(f, "Request"),
+            OrderStatus::Refund => write!(f, "Refund")
         }
     }
 }
@@ -155,11 +203,49 @@ impl Passenger {
     }
 }
 
-impl Seat {
-    pub fn new() -> Seat {
-        Seat{passenger_id:None,pay_id:None,submit:false}
+impl Order {
+    pub fn from_pay_result(pay:&PayResult,price:u32,count:u32) -> Order {
+        Order{_id:None,
+            openid: pay.openid.clone(),
+            trip_id: pay.attach.clone(),
+            order_id: pay.out_trade_no.clone(),
+            transaction_id: pay.transaction_id.clone(),
+            tel: None,
+            status: "PaySuccess".to_string(),
+            price: price,
+            count: count
+        }
+    }
+
+    pub fn set_status(&mut self,status:OrderStatus) {
+        self.status = format!("{}",status);
     }
 }
+
+impl ToJson for Order {
+    fn to_json(&self) -> Json {
+        match serde_json::to_string(self) {
+            Ok(json) =>  Json::String(json),
+            Err(err) => {
+                warn!("to json error : {}",err);
+                Json::String(String::new())
+            }
+        }
+    }
+}
+
+impl ToJson for Trip {
+    fn to_json(&self) -> Json {
+        match serde_json::to_string(self) {
+            Ok(json) =>  Json::String(json),
+            Err(err) => {
+                warn!("to json error : {}",err);
+                Json::String(String::new())
+            }
+        }
+    }
+}
+
 
 impl TripStatus {
     pub fn to_string(&self) -> String {
