@@ -148,7 +148,7 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
           function(res){     
              if(res.err_msg == "get_brand_wcpay_request:ok") {
                   $location.url("/buysitsuccess");
-                  window.location.herf="geekgogo.cn/static/index.html#/buysitsuccess";
+                  window.location.href="index.html#/buysitsuccess";
              } else if(res.err_msg == "get_brand_wcpay_request:fail") {
                   alert("支付失败，请重试！");
              }   
