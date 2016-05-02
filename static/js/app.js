@@ -294,8 +294,7 @@ app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams', 
   $scope.lineId = 1;
 
   $scope.publishTrip = function() {
-    var data = {lineId:$scope.lineId,startTime:$scope.startTime,seatCount:$scope.seatCount,venue:$scope.venue};
-    alert($scope.startTime.Format("yyyy-MM-ddTHH:mm:ss"));
+    var data = {lineId:$scope.lineId,startTime:$scope.startTime.Format("yyyy-MM-ddTHH:mm:ss"),seatCount:$scope.seatCount,venue:$scope.venue};
     $http.post('/publishTrip',data).success(function(data){
       if(data.success) {
         $location.url("/drivermyline");
