@@ -310,7 +310,7 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.status = TripStatus::Prepare.to_string();
                                 t.venue = venue.clone();
                                 service.add_trip(t);
-                                return Ok(Response::with((status::Ok,"{\"success\":false}")));
+                                return Ok(Response::with((status::Ok,"{\"success\":true}")));
                             },
                             Err(err) => {
                                 warn!("get line has a err :{}",err);
