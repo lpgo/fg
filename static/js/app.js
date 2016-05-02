@@ -274,11 +274,16 @@ app.controller('MyCarCtrl', ['$scope','$location', function($scope,$location){
 
 app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams', function($scope,$location,$http,$routeParams){
   $scope.plateNumber = $routeParams.plateNumber;
-  $scope.lineId = 1;
+  $scope.lineId = "1";
 
   $scope.publishTrip = function() {
-    $http.post('/publishTrip',{lineId:$scope.lineId,startTime:$scope.startTime,seatCount:$scope.seatCount,venue:$scope.venue}).success(function(data){
-
+    var data = {lineId:$scope.lineId,startTime:$scope.startTime,seatCount:$scope.seatCount,venue:$scope.venue};
+    $http.post('/publishTrip',data).success(function(data){
+      if(data.success) {
+        $location.url("/drivermyline");
+      } else {
+        alert("publishTrip error");
+      }
     });
   };
 
