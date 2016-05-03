@@ -238,7 +238,11 @@ app.controller('DriverTripCtrl', ['$scope','$location', function($scope,$locatio
 
 }]);
 
-app.controller('PassengerTripCtrl', ['$scope','$location', function($scope,$location){
+app.controller('PassengerTripCtrl', ['$scope','$location','$http', function($scope,$location,$http){
+	$http.post("/getTripInfo",null).success(function(data){
+		$scope.trip = data.trip;
+
+	});
 
 }]);
 

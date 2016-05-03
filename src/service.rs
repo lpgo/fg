@@ -123,7 +123,8 @@ impl Service {
 		self.0.get_by_id::<Trip>(oid)
 	}
 
-	pub fn get_owner_trips(&self,openid:&str) -> Result<String> {
+    
+	pub fn get_trip_info(&self,openid:&str) -> Result<String> {
 		self.0.get_by_openid::<Trip>(openid).and_then(|trip|{
 
 			let oid = match trip._id.clone().unwrap() {
@@ -157,7 +158,16 @@ impl Service {
 				j.set("orders",orders);
 			});
 			json::encode(&rep.unwrap()).map_err(|err|ServiceError::JsonEncoderError(err))
-		})
+		}).or_else(|_|{
+            self.0.get_by_openid::<Order>(openid).and_then(|order|{
+                self.0.get_by_openid::<Trip>(&order.trip_id).and_then(|trip|{
+			        let rep = jsonway::object(|j|{
+				         j.set("trip",trip);
+			        });
+			        json::encode(&rep.unwrap()).map_err(|err|ServiceError::JsonEncoderError(err))
+                })
+            })
+        })
 	}
 
 	pub fn get_passenger_trips(&self,openid:&str) -> Result<String> {

@@ -455,6 +455,23 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
     }
 }
 
+pub fn get_trip_info(req: &mut Request) -> IronResult<Response> {
+    match get_session::<LoginStatus>(req).ok_or(ServiceError::NoLogin).and_then(|login_status|{
+        req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+            service.get_trip_info(&login_status.openid)
+        })
+    }) {
+        Ok(info) => {
+            let res:&str = &info;
+            Ok(Response::with((status::Ok,res)))
+        },
+        Err(err) => {
+            warn!("get trip info error : {}",err);
+            Ok(Response::with((status::Ok,"{\"success\":false}")))
+        }
+    }
+}
+
 pub fn get_lines(req: &mut Request) -> IronResult<Response> {
     let service = req.get::<PersistRead<Service>>().unwrap();
     Ok(Response::with((status::Ok,service.get_lines())))

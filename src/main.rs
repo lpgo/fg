@@ -61,7 +61,7 @@ fn main() {
     router.post("/getCode", wx::get_code);
     router.post("/tripDetail",wx::trip_detail);
     router.post("/getUserInfo",wx::get_user_info);
-
+    router.post("/getTripInfo",wx::get_trip_info);
     //template
     router.get("/pinche/index.html",wx::index_template);
     //router.get("/pinche/tripDetail",wx::trip_detail_template);
