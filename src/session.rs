@@ -7,6 +7,7 @@ use iron::{status,AfterMiddleware};
 use iron::modifiers::Header;
 use iron::typemap::{TypeMap, Key};
 use persist::State as PersistState;
+use std::fmt;
 
 use uuid::Uuid;
 
@@ -24,6 +25,13 @@ impl Key for SessionContext {
     type Value = SessionContext;
 }
 
+
+impl fmt::Debug for Session{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f,"expire:{}",self.expire)
+    }
+}
+
 unsafe impl Sync for SessionContext {
     // add code here
 }
@@ -33,9 +41,8 @@ unsafe impl Send for SessionContext {
 }
 
 impl SessionContext {
-    pub fn get_session(&self,req:& Request) -> Option<&Session> {
+    pub fn get_session(&mut self,req:& Request) -> Option<&Session> {
       	let cookie = req.headers.get::<Cookie>();
-            warn!("cookie is {:?}",cookie);
     	match cookie {
             Some(ref value) => {
 	    		let Cookie(ref ckvec) = **value;
@@ -46,6 +53,12 @@ impl SessionContext {
                 let cookie_obj = cookie_vec[0];
                 let cookie_value = cookie_obj.value.clone();
                 //let SessionContext(data) = *self;
+                {
+                    if let Some(ref mut  session) = self.0.get_mut(&cookie_value) {
+                        session.expire = 5u32;
+                    }
+
+                }
                 self.0.get(&cookie_value)
 
             }
@@ -65,7 +78,11 @@ impl SessionContext {
                 let cookie_obj = cookie_vec[0];
                 let cookie_value = cookie_obj.value.clone();
                 //let SessionContext(data) = *self;
-                self.0.get_mut(&cookie_value)
+                let mut result = self.0.get_mut(&cookie_value);
+                if let Some(ref mut session) = result {
+                    session.expire = 5u32;
+                }
+                result
 
             }
             None => None
@@ -78,12 +95,28 @@ impl SessionContext {
     	cookie.path = Some("/".to_owned());
         res.set_mut(Header(SetCookie(vec![cookie])));
     	
-    	let session = Session { data:TypeMap::new(),expire:0u32 };
+    	let session = Session { data:TypeMap::new(),expire:5u32 };
     	self.0.insert(uid.clone(),session);
         self.0.get_mut(&uid).unwrap()
     }
-}
 
+    pub fn check_session(&mut self) {
+        let mut keys = Vec::new();
+        for (key,session) in self.0.iter_mut() {
+            if session.expire <= 0u32 {
+                keys.push(key.clone());
+            } else {
+                session.expire -= 1u32;
+            }
+        }
+        for key in keys {
+            self.0.remove(&key);
+            warn!("SessionContext remove session {}",&key);
+        }
+        warn!("SessionContext is {:?}",self.0);
+    }
+}
+/*
 impl AfterMiddleware for CheckSession {
     fn after(&self, req: &mut Request, mut res: Response) -> IronResult<Response> {
     	let sc1 = req.get::<PersistState<SessionContext>>().unwrap();
@@ -110,3 +143,4 @@ impl AfterMiddleware for CheckSession {
 	    Ok(res)
     }
 }
+*/

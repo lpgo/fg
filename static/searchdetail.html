@@ -20,234 +20,32 @@
         </div>
     </div>
 </div>
-<div id="newpost">
-    <div class="newpostitem">
+<div id="newpost" ng-repeat="trip in data">
+    <div class="newpostitem" ng-click="toBuy(trip._id.$oid)">
         <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
         <div class="newpoststart">
             <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
         </div>
         <div class="newpostlinetime">
             <div class="newpostline">
-                <span>府谷</span>
+		    <span>{{trip.start}}</span>
                 <span>&nbsp;-&nbsp;</span>
-                <span>太原</span>
+		<span>{{trip.end}}</span>
             </div>
             <div class="newposttime">
-                <span>2月15日10:15</span>
+		    <span>{{trip.start_time_text}}</span>
             </div>
         </div>
         <div class="newpostprice">
-            <span>60元|人</span>
+		<span>{{trip.price/100}}元|人</span>
         </div>
         <div class="newpostseat">
-            <span>余2座</span>
+		<span>余{{trip.current_seat}}座</span>
         </div>
         <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
     </div>
-    <div class="newpostitem">
-        <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-        <div class="newpoststart">
-            <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-        </div>
-        <div class="newpostlinetime">
-            <div class="newpostline">
-                <span>府谷</span>
-                <span>&nbsp;-&nbsp;</span>
-                <span>太原</span>
-            </div>
-            <div class="newposttime">
-                <span>2月15日10:15</span>
-            </div>
-        </div>
-        <div class="newpostprice">
-            <span>60元|人</span>
-        </div>
-        <div class="newpostseat">
-            <span>余2座</span>
-        </div>
-        <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-    </div>
-    <div class="newpostitem">
-        <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-        <div class="newpoststart">
-            <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-        </div>
-        <div class="newpostlinetime">
-            <div class="newpostline">
-                <span>府谷</span>
-                <span>&nbsp;-&nbsp;</span>
-                <span>太原</span>
-            </div>
-            <div class="newposttime">
-                <span>2月15日10:15</span>
-            </div>
-        </div>
-        <div class="newpostprice">
-            <span>60元|人</span>
-        </div>
-        <div class="newpostseat">
-            <span>余2座</span>
-        </div>
-        <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-    </div><div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-</div><div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-</div><div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-</div><div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-</div><div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
+      
 </div>
-    <div class="newpostitem">
-    <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-    <div class="newpoststart">
-        <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-    </div>
-    <div class="newpostlinetime">
-        <div class="newpostline">
-            <span>府谷</span>
-            <span>&nbsp;-&nbsp;</span>
-            <span>太原</span>
-        </div>
-        <div class="newposttime">
-            <span>2月15日10:15</span>
-        </div>
-    </div>
-    <div class="newpostprice">
-        <span>60元|人</span>
-    </div>
-    <div class="newpostseat">
-        <span>余2座</span>
-    </div>
-    <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-</div>
-    <div class="newpostitem">
-        <img class="newpostcaricon" src="img/peopleinfo.png" alt=""/>
-        <div class="newpoststart">
-            <i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>&nbsp;<i>i</i>
-        </div>
-        <div class="newpostlinetime">
-            <div class="newpostline">
-                <span>府谷</span>
-                <span>&nbsp;-&nbsp;</span>
-                <span>太原</span>
-            </div>
-            <div class="newposttime">
-                <span>2月15日10:15</span>
-            </div>
-        </div>
-        <div class="newpostprice">
-            <span>60元|人</span>
-        </div>
-        <div class="newpostseat">
-            <span>余2座</span>
-        </div>
-        <a class="newposticon" href=""><img src="img/peopleinfo.png" alt=""/></a>
-    </div>
-</div>
-
 
 <div id="navfooter">
     <div id="navfooterleft">

@@ -2,17 +2,10 @@
     <div id="title">
         天天拼车
         <img id="indexmessage" src="img/message.png">
-        <img id="indexpeopleinfo" src="img/peopleinfo.png">
+        <img id="indexpeopleinfo" src="img/peopleinfo.png" ng-click="toProfile()">
         <img id="indexarrowup" src="img/arrowup.png">
         <span id="indexlocation">府谷</span>
     </div>
-    <div id="subtitle" class="ks-clear">
-        <div id="subtitleleft">
-            <div>
-                <i>I</i>
-                <span>乘客</span>
-            </div>
-
         </div>
         <div id="subtitleright" ng-click="publishTrip()">
             <div>
@@ -24,17 +17,17 @@
 
 </div>
 <div id="content">
-    <form id="search" action="" method="get">
         <div class="searchlocation">
-            <input  id="searchbegin" type="text" placeholder="起点"/>
-            <img src="img/searcharrow.png" alt=""/>
-            <input id="searchend" type="text" placeholder="终点"/>
-            <input id="searchtime" type="text" placeholder="时间"/>
+		<select ng-model="start" ng-options="s[0].start for s in allLines" ng-change="change(start)">
+			<option value="">起点</option>
+		</select>
+            <img src="img/arrowup.png" alt=""/>
+		<select ng-model="end" ng-options="s.end for s in ends">
+			<option value="">终点</option>
+		</select>
+            <input id="searchtime" type="date" placeholder="时间" ng-model="time"/>
         </div>
-
-        <input  id="submit" type="submit" value="查&nbsp&nbsp&nbsp询"></input>
-
-    </form>
+	<button ng-click="search()">查</button>
     <div id="hotline">
         <div id="hotlinetitle">热门线路</div>
         <div id="hotlinsec1">
@@ -65,7 +58,7 @@
                     </div>
                 </div>
                 <div class="newpostprice">
-                    <span>{{trip.price}}元|人</span>
+                    <span>{{trip.price/100}}元|人</span>
                 </div>
                 <div class="newpostseat">
                     <span>余{{trip.current_seat}}座</span>

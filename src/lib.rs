@@ -55,6 +55,19 @@ macro_rules! redirect2 {
     })  
 }
 
+macro_rules! get_db {
+    ($c:expr) => ({
+        let client = $c.lock().unwrap(); 
+        let db_name = ConfigManager::get_config_str("app", "dbname");
+        let db_user = ConfigManager::get_config_str("app", "dbuser");
+        let db_pwd = ConfigManager::get_config_str("app", "dbpwd");
+        let db = client.db(&db_name);
+        db.auth(&db_user,&db_pwd).unwrap();
+        warn!("auth end");
+        db
+    })
+}
+
 pub mod wx;
 pub mod db;
 pub mod model;

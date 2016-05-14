@@ -62,6 +62,9 @@ fn main() {
     router.post("/tripDetail",wx::trip_detail);
     router.post("/getUserInfo",wx::get_user_info);
     router.post("/getTripInfo",wx::get_trip_info);
+    router.post("/submitOrder",wx::submit_order);
+    router.post("/getLines",wx::get_lines);
+    router.post("/getHotLines",wx::get_hot_lines);
     //template
     router.get("/pinche/index.html",wx::index_template);
     //router.get("/pinche/tripDetail",wx::trip_detail_template);
@@ -82,8 +85,10 @@ fn main() {
     let persist_instance= PersistState::<wx::WxInstance>::both(instance);
     let therad_instance = persist_instance.0.clone();
     middleware.link(persist_instance);
-    middleware.link(PersistRead::<service::Service>::both(service.clone()));
-    middleware.link(PersistState::<session::SessionContext>::both(session_context));
+    //middleware.link(PersistRead::<service::Service>::both(service.clone()));
+    middleware.link((service.clone(),service.clone()));
+    let ps = PersistState::<session::SessionContext>::one(session_context);
+    middleware.link((ps.clone(),ps.clone()));
     //middleware.link_after(session::CheckSession);
 
     env_logger::init().unwrap();
@@ -110,7 +115,9 @@ fn main() {
             } else {
                 inst.access_token_expires -=60;
             }
-            service.update_status();
+            service.update_trips_running();
+            let mut context = ps.data.write().unwrap();
+            context.check_session();
         }
     });
 

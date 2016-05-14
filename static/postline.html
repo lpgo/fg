@@ -15,11 +15,15 @@
     </div>
     <div class="item">
         <i class="icon iconfont" id="starticon">&#xe64a;</i>
-        <input type="text" placeholder="起点">
+	<select ng-model="start" ng-options="s[0].start for s in allLines" ng-change="changeStart(start)">
+		<option value="">起点</option>
+	</select>
     </div>
     <div class="item">
         <i class="icon iconfont " id="endicon">&#xe64a;</i>
-        <input type="text" placeholder="终点">
+	<select ng-model="line" ng-options="s.end for s in ends" >
+		<option value="">终点</option>
+	</select>
     </div>
     <div class="item">
         <i class="icon iconfont" >&#xe706;</i>
@@ -49,7 +53,7 @@
     <div class="item clear" id="item2">
         <i class="icon iconfont leftimtetext">&#xe64e;</i>
         <span  class="leftimtetext">单座价格</span>
-        <span class="rightitemtext">40元</span>
+	<span class="rightitemtext">{{line.price/100}}元</span>
     </div>
 </div>
 <div id="button">

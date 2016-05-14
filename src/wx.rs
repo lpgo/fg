@@ -179,7 +179,7 @@ pub fn wx(req:&mut Request) -> IronResult<Response>{
 }
 
 pub fn register_owner(req:&mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
+    let service = req.get::<Service>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
     match req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
         let plate_number = &hashmap.get("plateNumber").unwrap()[0];
@@ -280,7 +280,10 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
         return Ok(Response::with((status::Ok,"{\"success\":false}")));
     }
 
-    let service = req.get::<PersistRead<Service>>().unwrap();
+    let service = req.get::<Service>().unwrap();
+    if service.is_busy(&login_status.openid){
+        return Ok(Response::with((status::Ok,"{\"success\":false,\"budy\":true}")));
+    }
     match req.get_ref::<UrlEncodedBody>() {
         Ok(ref hashmap) => {
             let line_id = &hashmap.get("lineId").unwrap()[0];
@@ -302,14 +305,16 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
                                 t.line_id = id;
                                 t.start = line.start;
                                 t.end = line.end;
-                                t.price = format!("{:.*}",2,line.price as f32/100f32);
+                                t.price = line.price;
                                 t.start_time = start.timestamp();
                                 t.start_time_text = start.format("%Y-%m-%d %H:%M").to_string();
                                 t.seat_count = seat;
                                 t.current_seat = seat;
                                 t.status = TripStatus::Prepare.to_string();
                                 t.venue = venue.clone();
-                                t.plate_number = login_status.owner.unwrap().plate_number;
+                                let owner = &login_status.owner.unwrap();
+                                t.plate_number = owner.plate_number.clone();
+                                t.tel = Some(owner.tel.clone());
                                 service.add_trip(t);
                                 return Ok(Response::with((status::Ok,"{\"success\":true}")));
                             },
@@ -332,10 +337,10 @@ pub fn publish_trip(req:&mut Request) -> IronResult<Response> {
 }
 
 pub fn trip_detail(req:&mut Request) -> IronResult<Response> {
-    match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+    match req.get::<Service>().and_then(|service|{
         req.get_ref::<UrlEncodedBody>().map_err(|err|ServiceError::UrlDecodingError(err)).and_then(|hashmap|{
             let oid = &hashmap.get("oid").unwrap()[0];
-            service.get_trip_by_oid(oid)
+            service.get_trip_by_id(oid)
         }).and_then(|trip|{
             serde_json::to_string(&trip).map_err(|err|ServiceError::SerdeJsonError(err))
         })
@@ -363,7 +368,7 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
             Err(ServiceError::Other("Verify sign error!".to_string()))
         }
     }).and_then(|result|{
-        req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).map(|service|{
+        req.get::<Service>().map(|service|{
             service.pay_success(&result);
         })
     }) {
@@ -378,7 +383,7 @@ pub fn pay_result(req:&mut Request) -> IronResult<Response>  {
 }
 
 pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
+    let service = req.get::<Service>().unwrap();
     let mut login_status = get_session::<LoginStatus>(req).unwrap();
     let mut success = false;
     match req.get_ref::<UrlEncodedBody>() {
@@ -409,7 +414,7 @@ pub fn register_passenger(req:&mut Request) -> IronResult<Response> {
 }
 
 pub fn get_trips(req:&mut Request) -> IronResult<Response> {
-    match req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+    match req.get::<Service>().and_then(|service|{
             serde_json::to_string(&service.get_new_trips()).map_err(|err|ServiceError::SerdeJsonError(err))
     }) {
         Ok(s) => {
@@ -432,12 +437,13 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
             None
         }
     }).ok_or(ServiceError::NoLogin).and_then(|login_status|{
-        req.get::<PersistRead<Service>>().map(|service|(service,login_status)).map_err(|err|ServiceError::PersistentError(err))
+        req.get::<Service>().map(|service|(service,login_status))
     }).and_then(|(service,login_status)|{
         req.get_ref::<UrlEncodedBody>().map(|hashmap|(service,login_status,hashmap)).map_err(|err|ServiceError::UrlDecodingError(err))
     }).and_then(|(service,login_status,hashmap)|{
         let oid  = &hashmap.get("oid").unwrap()[0];
-        service.apply_trip(oid,&login_status.openid)
+        let count = &hashmap.get("count").unwrap()[0];
+        service.apply_trip(oid,&login_status.openid,count)
     }).map(|payid|{
          pay::create_pay_json(&payid)
     });
@@ -449,19 +455,32 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
             Ok(Response::with((status::Ok,format!("{}",r))))
         },
         Err(err) => {
-                        warn!("{}",err);
-                        Ok(Response::with((status::Ok,"{\"success\":false}")))
+            warn!("{}",err);
+            match err {
+                ServiceError::DontHaveEnoughSeats => {
+                    Ok(Response::with((status::Ok,"{\"success\":false,\"enough\":false,\"busy\":false}")))
+                },
+                ServiceError::UserBusy(_) => {
+                    Ok(Response::with((status::Ok,"{\"success\":false,\"enough\":true,\"busy\":true}")))
+                },
+                ServiceError::NoLogin => {
+                    Ok(Response::with((status::Ok,"{\"success\":false,\"enough\":true,\"busy\":false,\"noAuth\":true}")))
+                },
+                _ => Ok(Response::with((status::Ok,"{\"success\":false,\"enogth\":true,\"busy\":false}")))
+                
+            }
         }
     }
 }
 
 pub fn get_trip_info(req: &mut Request) -> IronResult<Response> {
     match get_session::<LoginStatus>(req).ok_or(ServiceError::NoLogin).and_then(|login_status|{
-        req.get::<PersistRead<Service>>().map_err(|err|ServiceError::PersistentError(err)).and_then(|service|{
+        req.get::<Service>().and_then(|service|{
             service.get_trip_info(&login_status.openid)
         })
     }) {
         Ok(info) => {
+            warn!("get trip info : {}",&info);
             let res:&str = &info;
             Ok(Response::with((status::Ok,res)))
         },
@@ -472,13 +491,28 @@ pub fn get_trip_info(req: &mut Request) -> IronResult<Response> {
     }
 }
 
+pub fn submit_order(req: &mut Request) -> IronResult<Response> {
+    match get_session::<LoginStatus>(req).ok_or(ServiceError::NoLogin).and_then(|login_status|{
+        req.get::<Service>().and_then(|service|{
+            service.submit_order(&login_status.openid);
+            Ok(())
+        })
+    }) {
+        Ok(_) => Ok(Response::with((status::Ok,"{\"success\":true}"))),
+        Err(err) => {
+            warn!("submit order is error : {}",err);
+            Ok(Response::with((status::Ok,"{\"success\":false}")))
+        }
+    }
+}
+
 pub fn get_lines(req: &mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
+    let service = req.get::<Service>().unwrap();
     Ok(Response::with((status::Ok,service.get_lines())))
 }
 
 pub fn get_hot_lines(req: &mut Request) -> IronResult<Response> {
-    let service = req.get::<PersistRead<Service>>().unwrap();
+    let service = req.get::<Service>().unwrap();
     Ok(Response::with((status::Ok,service.get_hot_lines())))
 }
 
@@ -508,7 +542,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
 
         api_result.openid.and_then(|openid|{
             login_status.openid = openid.clone();
-            req.get::<PersistRead<Service>>().ok().map(|service|(service,openid))
+            req.get::<Service>().ok().map(|service|(service,openid))
         }).and_then(|(service,openid)|{
             let (o,p) = service.get_user_by_id(&openid);
             match (o,p) {
@@ -539,7 +573,7 @@ pub fn index_template(req: &mut Request) -> IronResult<Response> {
 }
 
 pub fn redirect_index(req: &mut Request,mut resp:Response) -> IronResult<Response> {
-    match req.get::<PersistRead<Service>>().map(|service|{
+    match req.get::<Service>().map(|service|{
         service.get_new_trips()
     }) {
         Ok(vec) => {
@@ -634,7 +668,7 @@ pub fn set_session<K:Key>(req: &mut Request,res:&mut Response,value:K::Value) wh
 
 pub fn get_session<K:Key>(req: & mut Request) -> Option<K::Value> where K::Value:Clone {
     let mut sc1 = req.get::<PersistState<SessionContext>>().unwrap();
-    let sc = sc1.read().unwrap();
+    let mut sc = sc1.write().unwrap();
     let session = sc.get_session(req);
     if let Some(s) = session {
         s.data.get::<K>().map(|v| v.clone())

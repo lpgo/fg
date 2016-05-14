@@ -110,13 +110,38 @@ app.config(function($routeProvider){
     templateUrl:"/static/profile.html",
     controller:"ProfileCtrl"
   });
-  $routeProvider.when("/searchdetail",{
+  $routeProvider.when("/searchdetail/:lineId/:time",{
     templateUrl:"/static/searchdetail.html",
     controller:"SearchDetailCtrl"
   });
 
 });
+/*
+app.service("LineService",['$http',function($http){
+	var allLines = [];
+	var hotLines = [];
 
+	$http.post("/getLines",null).success(function(data){
+		allLines = data;
+	});
+	$http.post("/getHotLines",null).success(function(data){
+		hotLines = data;
+	});
+	this.getStarts = function() {
+		var starts = [];
+		for line in allLines {
+			starts.push(line.start);
+		}
+		return starts;
+	}
+	this.getEnds = function(start) {
+		var ends = [];
+		for line in allLines {
+			if(line.start == start) ends.push(line.end);	
+		}
+	}
+}]);
+*/
 app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$rootScope',function($scope,$routeParams,$http,$location,$rootScope){
   var oid = $routeParams.oid;
   $rootScope.oid = oid;
@@ -133,7 +158,7 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
   }
 
   $scope.applyTrip = function() {
-    $http.post("/applyTrip",{oid:oid}).success(function(data){
+    $http.post("/applyTrip",{oid:oid,count:$scope.count}).success(function(data){
       if(data.success) {
         WeixinJSBridge.invoke(
           'getBrandWCPayRequest', 
@@ -148,7 +173,6 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
           function(res){     
              if(res.err_msg == "get_brand_wcpay_request:ok") {
                   $scope.$apply($location.url("/buysitsuccess"));
-                  alert("ok");
                   //window.location.href="index.html#/buysitsuccess";
              } else if(res.err_msg == "get_brand_wcpay_request:fail") {
                   alert("支付失败，请重试！");
@@ -156,7 +180,17 @@ app.controller('BuySeatCtrl', ['$scope','$routeParams','$http','$location','$roo
           }
         ); 
       } else {
-        $location.url("/confirmation");
+	      if(!data.enough) {
+		      alert("剩余座位不够了:-)");
+		      $location.url("/");
+	      } else if(data.busy) {
+		     alert("你正在参加拼车中");
+		    $location.url("/passengermyline");
+	      }	else if(data.noAuth){
+	      	      $location.url("/confirmation");
+	      } else {
+		      alert("error");
+	      }
       }
     });
   }
@@ -169,12 +203,39 @@ app.controller('ListCtrl', ['$scope','$location', function($scope,$location){
 	}
 }]);
 
-app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,$location){
+app.controller('MainCtrl', ['$scope','$http','$location','$rootScope', function($scope,$http,$location,$rootScope){
 
   $scope.data = [];
+  $scope.time = new Date();
   var userType = null;
   var plateNumber = null;
+  var lineId = 1;
 
+  $scope.allLines = {};
+  $scope.ends = [];
+  $scope.hotLines = [];
+  $http.post("/getLines",null).success(function(data){
+	angular.forEach(data,function(line,key) {
+		if($scope.allLines[line.start]) {
+			$scope.allLines[line.start].push(line);
+		} else {
+			$scope.allLines[line.start] = [line];
+		}
+		if(line.hot)
+			$scope.hotLines.push(line);
+	});
+	$rootScope.allLines = $scope.allLines;
+  });
+  $scope.change = function(start) {
+	$scope.ends = start;
+  }
+
+  $scope.search = function() {
+	if($scope.end.id)
+		lineId = $scope.end.id;
+	$location.url("/searchdetail/"+lineId+"/"+$scope.time.getTime());
+	
+  }
   $http.post("/getTrips",null).success(function(data){
     $scope.data = data;
   });
@@ -185,7 +246,6 @@ app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,
       plateNumber = data.plateNumber || null;
     } 
   });
- 
   $scope.publishTrip = function() {
     if(userType == "Owner") {
       $location.url("/postline/"+plateNumber);
@@ -195,6 +255,10 @@ app.controller('MainCtrl', ['$scope','$http','$location', function($scope,$http,
       $location.url("/driverregister/"+userType);
     }
   };
+
+  $scope.toProfile = function() {
+	  $location.url("/profile");
+  }
 
 }]);
 
@@ -239,10 +303,31 @@ app.controller('DriverTripCtrl', ['$scope','$location', function($scope,$locatio
 }]);
 
 app.controller('PassengerTripCtrl', ['$scope','$location','$http', function($scope,$location,$http){
+	$scope.isOwner = false;
+	$scope.isPassenger = false;
+	function loadData() {
 	$http.post("/getTripInfo",null).success(function(data){
+		if(!data.success) {
+			$scope.isOwner = false;
+			$scope.isPassenger = false;
+			return ;
+		}
+		if(data.orders) {
+			$scope.orders = data.orders;
+			$scope.isOwner = true;
+		} else {
+			$scope.order = data.order;
+			$scope.isPassenger = true;
+		}
 		$scope.trip = data.trip;
-
 	});
+	}
+	loadData();
+	$scope.submit = function() {
+		$http.post("/submitOrder",null).success(function(data){
+			loadData();
+		});
+	}
 
 }]);
 
@@ -297,30 +382,54 @@ app.controller('MyCarCtrl', ['$scope','$location', function($scope,$location){
 
 }]);
 
-app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams', function($scope,$location,$http,$routeParams){
+app.controller('PublishTripCtrl', ['$scope','$location','$http','$routeParams','$rootScope', function($scope,$location,$http,$routeParams,$rootScope){
   $scope.plateNumber = $routeParams.plateNumber;
   $scope.lineId = 1;
+  $scope.ends = [];
 
   $scope.publishTrip = function() {
-    var data = {lineId:$scope.lineId,startTime:$scope.startTime.Format("yyyy-MM-ddTHH:mm"),seatCount:$scope.seatCount,venue:$scope.venue};
+    var data = {lineId:$scope.line.id,startTime:$scope.startTime.Format("yyyy-MM-ddTHH:mm"),seatCount:$scope.seatCount,venue:$scope.venue};
     $http.post('/publishTrip',data).success(function(data){
       if(data.success) {
-        $location.url("/drivermyline");
+        $location.url("/passengermyline");
+      } else if(data.busy){
+	      alert("你正在参加拼车中");
+	      $location.url("/passengermyline");
       } else {
         alert("publishTrip error");
       }
     });
   };
+  $scope.changeStart = function(data) {
+	$scope.ends = data;
+  };
 
 }]);
 
 app.controller('ProfileCtrl', ['$scope','$location', function($scope,$location){
-
+	$scope.toMyTrip = function() {
+		$location.url("/passengermyline");
+	}
 }]);
 
-app.controller('SearchDetailCtrl', ['$scope','$location', function($scope,$location){
+app.controller('SearchDetailCtrl', ['$scope','$location','$routeParams','$http', function($scope,$location,$routeParams,$http){
+	var time = new Date(parseInt($routeParams.time));
+	var start = new Date(time.getFullYear(),time.getMonth(),time.getDate()).getTime()/1000;
+	var end = new Date(time.getFullYear(),time.getMonth(),time.getDate()+1).getTime()/1000;
+	$scope.data = [];
+  	$http.post("/getTrips",null).success(function(data){
+		angular.forEach(data,function(trip,key){
+			if(trip.line_id == parseInt($routeParams.lineId) && trip.start_time > start && trip.start_time < end) {
+				$scope.data.push(trip);
+			}
+		});
+  	});
 
+	$scope.toBuy = function(oid) {
+		$location.url("/buysit/"+oid);
+	}
 }]);
+
 
 
 

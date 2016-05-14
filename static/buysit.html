@@ -20,7 +20,7 @@
         </div>
         <div id="linemoney" class="ks-clear">
             <div class="fr">
-                <p ><span id="linemoneynum">{{trip.price}}</span><span>元|位</span></p>
+                <p ><span id="linemoneynum">{{trip.price/100}}</span><span>元|位</span></p>
                 <p id="remainsit" >剩余{{trip.current_seat}}座位</p>
             </div>
 
@@ -48,7 +48,7 @@
     </div>
     <div id="lineinfo">
         <p id="lineinfostnum">购座数量  <span>icon</span> <span>{{count}}</span> <span>icon</span></p>
-        <p id="total">合计&nbsp;:&nbsp;<span>{{trip.price*count}}元</span></p>
+        <p id="total">合计&nbsp;:&nbsp;<span>{{trip.price/100*count}}元</span></p>
     </div>
     <div id="linebutton">
         <button type="button" ng-click="applyTrip()">购&nbsp;座</button>

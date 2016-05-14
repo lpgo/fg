@@ -15,7 +15,7 @@ pub struct Passenger {
     pub tel:String
 }
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub struct Order {
     _id: Option<Bson>,
     pub openid: String,
@@ -28,7 +28,7 @@ pub struct Order {
     pub count:u32
 }
 
-#[derive(PartialEq, Debug, Serialize, Deserialize,Default)]
+#[derive(PartialEq, Debug, Serialize, Deserialize,Default,Clone)]
 pub struct Trip {
     pub _id:Option<Bson>,
     pub openid: String,
@@ -39,16 +39,18 @@ pub struct Trip {
     pub line_id:u32,
     pub start:String,
     pub end:String,
-    pub price:String,
+    pub price:u32,
     pub venue:String,
     pub status:String,
     pub message:Option<String>,
-    pub plate_number: String
+    pub plate_number: String,
+    pub tel: Option<String>
 }
 
-#[derive(PartialEq, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Serialize, Deserialize,Clone)]
 pub enum TripStatus {
     Prepare,
+    Full,
     Running,
     Finish
 }
@@ -170,6 +172,17 @@ impl fmt::Display for OrderStatus {
         }
     }
 }
+impl fmt::Display for TripStatus {
+    fn fmt(&self, f:&mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            TripStatus::Prepare => write!(f, "Prepare"),
+            TripStatus::Running => write!(f,"Running"),
+            TripStatus::Finish => write!(f, "Finish"),
+            TripStatus::Full => write!(f, "Full")
+        }
+    }
+}
+
 
 #[derive(PartialEq, Debug, Serialize, Deserialize,Clone,Default)]
 pub struct LoginStatus {
@@ -220,12 +233,23 @@ impl Order {
     pub fn set_status(&mut self,status:OrderStatus) {
         self.status = format!("{}",status);
     }
+    
+    pub fn get_status(&self) -> OrderStatus {
+        match self.status.as_str() {
+            "PayFail" => OrderStatus::PayFail,
+            "PaySuccess" => OrderStatus::PaySuccess,
+            "Submit" => OrderStatus::Submit,
+            "Refund" => OrderStatus::Refund,
+            "Request" => OrderStatus::Request,
+            _ => OrderStatus::PayFail
+        }
+    }
 }
 
 impl ToJson for Order {
     fn to_json(&self) -> Json {
         match serde_json::to_string(self) {
-            Ok(json) =>  Json::String(json),
+            Ok(json) =>  Json::from_str(&json).unwrap(),
             Err(err) => {
                 warn!("to json error : {}",err);
                 Json::String(String::new())
@@ -237,7 +261,7 @@ impl ToJson for Order {
 impl ToJson for Trip {
     fn to_json(&self) -> Json {
         match serde_json::to_string(self) {
-            Ok(json) =>  Json::String(json),
+            Ok(json) =>  Json::from_str(&json).unwrap(),
             Err(err) => {
                 warn!("to json error : {}",err);
                 Json::String(String::new())
@@ -246,15 +270,11 @@ impl ToJson for Trip {
     }
 }
 
-
-impl TripStatus {
-    pub fn to_string(&self) -> String {
-        match *self {
-            TripStatus::Prepare => "Prepare".to_string(),
-            TripStatus::Running => "Running".to_string(),
-            TripStatus::Finish => "Finish".to_string()
-        }
+impl Trip {
+    pub fn set_status(&mut self, status:TripStatus) {
+        self.status = format!("{}",status);
     }
 }
+
 
     

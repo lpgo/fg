@@ -171,7 +171,7 @@ pub fn pay_to_client(openid:&str,amount:&str) {
 	strs.insert("openid",openid);
 	strs.insert("check_name","NO_CHECK");
 	strs.insert("amount",amount);
-	strs.insert("desc","thank you");
+	strs.insert("desc","这是付给你的拼车费");
 	strs.insert("spbill_create_ip","192.168.1.1");
 	let mut ss = String::new();
 	for (k,v) in strs {
@@ -193,7 +193,7 @@ pub fn pay_to_client(openid:&str,amount:&str) {
 			<openid>{}</openid>
 			<check_name>NO_CHECK</check_name>
 			<amount>{}</amount>
-			<desc>thank you</desc>
+			<desc>这是付给你的拼车费</desc>
 			<spbill_create_ip>192.168.1.1</spbill_create_ip>
 			<sign>{}</sign>
 		</xml>
