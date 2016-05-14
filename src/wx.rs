@@ -450,7 +450,7 @@ pub fn apply_trip(req:&mut Request) -> IronResult<Response> {
 
     match replay {
         Ok(rep) => {
-            let r = json::encode(&rep.unwrap()).unwrap();
+            let r = serde_json::to_string(&rep.unwrap()).unwrap();
             warn!("apply_trip() result : {}",r);
             Ok(Response::with((status::Ok,format!("{}",r))))
         },

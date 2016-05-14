@@ -196,7 +196,7 @@ impl Service {
 				j.set("orders",orders);
                 j.set("success",true);
 			});
-			json::encode(&rep.unwrap()).map_err(|err|ServiceError::JsonEncoderError(err))
+			serde_json::to_string(&rep.unwrap()).map_err(|err|ServiceError::SerdeJsonError(err))
 		}).or_else(|_|{
             self.get_order_by_openid(openid).and_then(|order|{
                 self.get_trip_by_id(&order.trip_id).and_then(|trip|{
@@ -205,7 +205,7 @@ impl Service {
                          j.set("order",order);
                         j.set("success",true);
 			        });
-			        json::encode(&rep.unwrap()).map_err(|err|ServiceError::JsonEncoderError(err))
+			        serde_json::to_string(&rep.unwrap()).map_err(|err|ServiceError::SerdeJsonError(err))
                 })
             })
         })
@@ -220,7 +220,7 @@ impl Service {
 	}
 
 	pub fn apply_trip(&self,oid:&str,openid:&str,count:&str) -> Result<String> {
-		let order_id = Uuid::new_v4().to_simple_string();
+		let order_id = Uuid::new_v4().simple().to_string();
 		let msg = "pinchefei".to_string();
         if self.is_busy(openid){
             Err(ServiceError::UserBusy(openid.to_string()))

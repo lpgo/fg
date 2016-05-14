@@ -92,7 +92,7 @@ fn main() {
     //middleware.link_after(session::CheckSession);
 
     env_logger::init().unwrap();
-    let mut hbse = HandlebarsEngine::new2();
+    let mut hbse = HandlebarsEngine::new();
     hbse.add(Box::new(DirectorySource::new("./templates/", ".hbs")));
     if let Err(r) = hbse.reload() {
         panic!("{}", r.description());

@@ -159,7 +159,7 @@ pub fn pre_pay(p : PrePay) -> Result<PrePayResult,&'static str> {
 
 pub fn pay_to_client(openid:&str,amount:&str) {
 
-	let nonce_str = Uuid::new_v4().to_simple_string();
+	let nonce_str = Uuid::new_v4().simple().to_string();
 	let api_key = ConfigManager::get_config_str("app", "apikey");
 	let appid = ConfigManager::get_config_str("app", "appid");
 	let mchid = ConfigManager::get_config_str("app", "mchid");
@@ -216,7 +216,7 @@ pub fn create_pay_json(prepay_id:&str) -> jsonway::ObjectBuilder{
 	let api_key = ConfigManager::get_config_str("app", "apikey");
 	let appid = ConfigManager::get_config_str("app", "appid");
 	let time = format!("{}",chrono::Local::now().timestamp());
-	let nonce_str = Uuid::new_v4().to_simple_string();
+	let nonce_str = Uuid::new_v4().simple().to_string();
 	let package = format!("prepay_id={}",prepay_id);
 	let mut sign = String::new();
 	{

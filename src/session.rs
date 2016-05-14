@@ -90,7 +90,7 @@ impl SessionContext {
     }
 
     pub fn new_session(&mut self,res:&mut Response) -> &mut Session{
-    	let uid = Uuid::new_v4().to_simple_string();
+    	let uid = Uuid::new_v4().simple().to_string();
     	let mut cookie = CookieObj::new("sessionid".to_string(),uid.clone());
     	cookie.path = Some("/".to_owned());
         res.set_mut(Header(SetCookie(vec![cookie])));
